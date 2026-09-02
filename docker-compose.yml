@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_USER=hymn_user
+      - DB_PASSWORD=hymn_password
+      - DB_NAME=hymn_db
+      - SESSION_SECRET=super_secret_session_key_for_icds
+      - CONFIDENCE_THRESHOLD=0.5
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_DATABASE=hymn_db
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db_data:

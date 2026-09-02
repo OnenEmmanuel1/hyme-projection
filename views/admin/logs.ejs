@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0 text-white">Command Logs</h2>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Timestamp</th>
+                        <th>Recognised Text</th>
+                        <th>Status</th>
+                        <th class="pe-4">Matched Hymn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (logs.length === 0) { %>
+                        <tr>
+                            <td colspan="4" class="text-center p-5 text-muted">
+                                <i data-lucide="inbox" style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 15px;"></i>
+                                <p class="mb-0">No command logs found.</p>
+                            </td>
+                        </tr>
+                    <% } %>
+                    <% logs.forEach(log => { %>
+                        <tr>
+                            <td class="ps-4 text-muted small"><%= new Date(log.Timestamp).toLocaleString() %></td>
+                            <td class="fw-semibold text-white">"<%= log.RecognisedText %>"</td>
+                            <td>
+                                <% if (log.Status === 'Matched') { %>
+                                    <span class="badge" style="background-color: rgba(20, 184, 166, 0.15); color: var(--success-color);">Matched</span>
+                                <% } else { %>
+                                    <span class="badge" style="background-color: rgba(239, 68, 68, 0.15); color: var(--danger-color);">Not Found</span>
+                                <% } %>
+                            </td>
+                            <td class="pe-4 text-white">
+                                <% if (log.MatchedHymnID) { %>
+                                    <strong style="color: var(--icds-primary);">#<%= log.HymnNumber %></strong> - <span class="text-muted"><%= log.Title %></span>
+                                <% } else { %>
+                                    <span class="text-muted">-</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

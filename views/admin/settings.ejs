@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0 text-white">Account Settings</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-white mb-4"><i data-lucide="lock" class="me-2" style="width: 20px; color: var(--icds-primary);"></i> Change Password</h5>
+                
+                <% if (error) { %>
+                    <div class="alert alert-danger" role="alert"><%= error %></div>
+                <% } %>
+                <% if (success) { %>
+                    <div class="alert alert-success" role="alert" style="background-color: rgba(20, 184, 166, 0.15); color: var(--success-color); border-color: var(--success-color);"><%= success %></div>
+                <% } %>
+
+                <form action="/admin/settings/password" method="POST">
+                    <div class="mb-4">
+                        <label for="newPassword" class="form-label text-muted fw-semibold">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

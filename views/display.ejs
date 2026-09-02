@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICDS - Projection Display</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="icds-display-body">
+    
+    <!-- Audio unlock overlay (browsers require interaction before TTS) -->
+    <div id="unlock-overlay" class="icds-unlock-overlay">
+        <h2>Projection Display Ready</h2>
+        <p>Click below to enter fullscreen presentation mode.</p>
+        <button id="unlock-btn" class="icds-btn-unlock">Start Fullscreen Display</button>
+    </div>
+
+    <div class="icds-display-container" id="display-container" style="display: none;">
+        <div id="idle-state" class="icds-display-state active">
+            <h1 class="icds-idle-text">ICDS Projection System</h1>
+            <p class="icds-idle-subtext">Waiting for operator command...</p>
+        </div>
+
+        <div id="not-found-state" class="icds-display-state">
+            <h1 class="icds-error-text">Hymn not found</h1>
+            <p class="icds-error-subtext">Please repeat your request.</p>
+        </div>
+
+        <div id="hymn-state" class="icds-display-state">
+            <div class="icds-hymn-header">
+                <span class="icds-hymn-number" id="hymn-number"></span>
+                <h1 class="icds-hymn-title" id="hymn-title"></h1>
+            </div>
+            <div class="icds-hymn-lyrics" id="hymn-lyrics"></div>
+            
+            <!-- Verse Navigation Controls -->
+            <button id="btn-prev-verse" class="icds-btn icds-btn-secondary icds-nav-btn icds-nav-left" style="display: none;">&#8592;</button>
+            <button id="btn-next-verse" class="icds-btn icds-btn-primary icds-nav-btn icds-nav-right" style="display: none;">&#8594;</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/display.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICDS</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Flat CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<% if (typeof hideSidebar === 'undefined' || !hideSidebar) { %>
+<div class="icds-app-layout">
+    <!-- Sidebar -->
+    <aside class="icds-sidebar">
+        <a href="/admin/dashboard" class="icds-sidebar-brand">
+            <i data-lucide="monitor-play"></i> ICDS
+        </a>
+
+        <div class="icds-sidebar-group">
+            <div class="icds-sidebar-label">Core</div>
+            <a href="/admin/dashboard" class="icds-nav-item <%= (typeof currentPath !== 'undefined' && currentPath === '/admin/dashboard') ? 'active' : '' %>">
+                <i data-lucide="layout-dashboard" width="18"></i> Home
+            </a>
+            <a href="/operator" class="icds-nav-item <%= (typeof currentPath !== 'undefined' && currentPath === '/operator') ? 'active' : '' %>">
+                <i data-lucide="mic" width="18"></i> Voice Command
+            </a>
+            <a href="/admin/hymns" class="icds-nav-item <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/admin/hymns')) ? 'active' : '' %>">
+                <i data-lucide="search" width="18"></i> Hymn Search
+            </a>
+            <a href="/admin/logs" class="icds-nav-item <%= (typeof currentPath !== 'undefined' && currentPath === '/admin/logs') ? 'active' : '' %>">
+                <i data-lucide="history" width="18"></i> History
+            </a>
+        </div>
+
+        <% if (typeof userRole !== 'undefined' && userRole === 'Administrator') { %>
+        <div class="icds-sidebar-group">
+            <div class="icds-sidebar-label">Growth</div>
+            <!-- Using modal trigger directly in sidebar since it's just a UI restyle, or just link to hymns page -->
+            <a href="/admin/hymns" class="icds-nav-item">
+                <i data-lucide="plus-circle" width="18"></i> Create Hymn
+            </a>
+        </div>
+        
+        <div class="icds-sidebar-group">
+            <a href="/admin/settings" class="icds-nav-item">
+                <i data-lucide="settings" width="18"></i> Settings
+            </a>
+            <a href="/admin/logout" class="icds-nav-item">
+                <i data-lucide="log-out" width="18"></i> Logout
+            </a>
+        </div>
+        <% } else { %>
+            <div class="icds-sidebar-group">
+                <a href="/admin/login" class="icds-nav-item">
+                    <i data-lucide="log-in" width="18"></i> Admin Login
+                </a>
+            </div>
+        <% } %>
+
+        <div class="icds-sidebar-footer">
+            <div class="icds-user-card">
+                <div class="icds-user-avatar">
+                    <%= (typeof userName !== 'undefined' ? userName.charAt(0) : 'U') %>
+                </div>
+                <div class="icds-user-info">
+                    <span class="icds-user-name"><%= (typeof userName !== 'undefined' ? userName : 'User') %></span>
+                    <span class="icds-user-role"><%= (typeof userRole !== 'undefined' ? userRole : 'Operator') %></span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <main class="icds-main">
+        <!-- Top Status Bar -->
+        <header class="icds-topbar">
+            <div class="icds-status-indicator" id="global-status-indicator">
+                <div class="icds-status-dot" id="global-status-dot"></div>
+                <span id="global-status-text">Idle</span>
+            </div>
+        </header>
+
+        <div class="icds-content container-fluid">
+<% } else { %>
+<div class="container mt-5">
+<% } %>

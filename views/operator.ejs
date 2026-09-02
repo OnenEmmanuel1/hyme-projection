@@ -1,0 +1,54 @@
+<%- include('partials/header') %>
+
+<div class="icds-hero">
+    <h1>What hymn would you like to display?</h1>
+    <p>Say a hymn number or title — recognized in real time.</p>
+</div>
+
+<div class="icds-voice-panel">
+    <div id="listen-btn" class="icds-mic-btn">
+        <i data-lucide="mic"></i>
+    </div>
+    
+    <div id="transcript-display" class="icds-transcript-area">
+        Ask anything...
+    </div>
+    
+    <button id="submit-btn" class="icds-submit-btn">
+        <i data-lucide="send"></i>
+    </button>
+</div>
+
+<!-- Feedback hidden by default, shown via JS if error/success -->
+<div id="feedback-display" class="icds-feedback text-center mb-5" style="display: none;"></div>
+
+<div class="icds-quick-actions-container">
+    <% if (recentLogs && recentLogs.length > 0) { %>
+        <div class="icds-quick-actions-grid">
+            <% recentLogs.forEach(log => { %>
+                <div class="icds-quick-card" onclick="submitCommand('<%= log.Title.replace(/'/g, "\\'") %>')">
+                    <i data-lucide="monitor-speaker" class="icds-quick-card-icon"></i>
+                    <div class="icds-quick-card-title">Hymn <%= log.HymnNumber %></div>
+                    <div class="icds-quick-card-subtitle"><%= log.Title %></div>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div class="icds-empty-state">
+            <i data-lucide="inbox" style="width: 32px; height: 32px; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p>No recently displayed hymns.</p>
+        </div>
+    <% } %>
+</div>
+
+<!-- Send a hidden script variable for the script -->
+<script>
+    function submitCommand(text) {
+        if (window.sendVoiceCommand) {
+            window.sendVoiceCommand(text, 1.0); // 1.0 confidence since it's manual
+        }
+    }
+</script>
+<script src="/js/operator.js"></script>
+
+<%- include('partials/footer') %>

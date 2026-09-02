@@ -1,0 +1,424 @@
+/* ICDS Global Styles (Dark AI Hub Theme) */
+:root {
+    /* Color Palette based on reference */
+    --icds-bg: #0d0d0d;
+    --icds-card-bg: #151515;
+    --icds-sidebar-bg: #111111;
+    --icds-primary: #0f9d8a; /* Teal/Mint Accent */
+    --icds-primary-hover: #0c8273;
+    --icds-text: #f0f0f0;
+    --icds-text-muted: #888888;
+    --icds-border: #222222;
+    
+    --success-color: #14b8a6;
+    --danger-color: #ef4444;
+    
+    /* Display Projection Colors */
+    --bg-display: #000000;
+    --text-display: #ffffff;
+    --text-display-muted: #aaaaaa;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--icds-bg) !important;
+    color: var(--icds-text) !important;
+    margin: 0;
+    padding: 0;
+}
+
+/* --------------------
+   Layout Shell (Sidebar + Main)
+   -------------------- */
+.icds-app-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.icds-sidebar {
+    width: 260px;
+    background-color: var(--icds-sidebar-bg);
+    border-right: 1px solid var(--icds-border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px;
+    box-sizing: border-box;
+}
+
+.icds-sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--icds-text);
+    text-decoration: none;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+.icds-sidebar-brand:hover { color: var(--icds-text); }
+
+.icds-sidebar-group {
+    margin-bottom: 25px;
+}
+.icds-sidebar-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--icds-text-muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    letter-spacing: 0.05em;
+}
+
+.icds-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    color: var(--icds-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+    margin-bottom: 2px;
+}
+.icds-nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--icds-text);
+}
+.icds-nav-item.active {
+    background-color: rgba(15, 157, 138, 0.15); /* Light teal bg */
+    color: var(--icds-primary);
+}
+
+.icds-sidebar-footer {
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid var(--icds-border);
+}
+
+.icds-user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+}
+.icds-user-avatar {
+    width: 36px;
+    height: 36px;
+    background-color: var(--icds-primary);
+    color: #fff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+.icds-user-info {
+    display: flex;
+    flex-direction: column;
+}
+.icds-user-name { font-size: 0.9rem; font-weight: 600; color: var(--icds-text); }
+.icds-user-role { font-size: 0.75rem; color: var(--icds-text-muted); }
+
+/* Main Content Area */
+.icds-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: var(--icds-bg);
+}
+
+.icds-topbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the status */
+    padding: 0 30px;
+}
+
+.icds-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--icds-card-bg);
+    border: 1px solid var(--icds-border);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.icds-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--icds-text-muted);
+}
+.icds-status-dot.listening { background-color: var(--icds-primary); box-shadow: 0 0 8px var(--icds-primary); }
+.icds-status-dot.processing { background-color: #fbbf24; }
+.icds-status-dot.error { background-color: var(--danger-color); }
+
+.icds-content {
+    padding: 30px;
+    flex: 1;
+}
+
+/* --------------------
+   Admin Overrides (for Bootstrap elements inside main content)
+   -------------------- */
+.card {
+    background-color: var(--icds-card-bg) !important;
+    border: 1px solid var(--icds-border) !important;
+    color: var(--icds-text) !important;
+    border-radius: 12px;
+    box-shadow: none !important;
+}
+
+.table {
+    color: var(--icds-text) !important;
+}
+.table-light, .table thead th {
+    background-color: var(--icds-sidebar-bg) !important;
+    color: var(--icds-text-muted) !important;
+    border-color: var(--icds-border) !important;
+}
+.table td, .table th {
+    border-color: var(--icds-border) !important;
+}
+.table-hover tbody tr:hover td {
+    background-color: rgba(255,255,255,0.03) !important;
+    color: var(--icds-text) !important;
+}
+
+.form-control, .form-select {
+    background-color: var(--icds-bg) !important;
+    border: 1px solid var(--icds-border) !important;
+    color: var(--icds-text) !important;
+}
+.form-control:focus {
+    border-color: var(--icds-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(15, 157, 138, 0.25) !important;
+}
+
+.btn-primary {
+    background-color: var(--icds-primary) !important;
+    border-color: var(--icds-primary) !important;
+    color: #fff !important;
+}
+.btn-primary:hover {
+    background-color: var(--icds-primary-hover) !important;
+}
+.btn-outline-primary {
+    color: var(--icds-primary) !important;
+    border-color: var(--icds-primary) !important;
+}
+.btn-outline-primary:hover {
+    background-color: var(--icds-primary) !important;
+    color: #fff !important;
+}
+.text-muted { color: var(--icds-text-muted) !important; }
+.bg-light { background-color: var(--icds-bg) !important; }
+
+/* Modals */
+.modal-content {
+    background-color: var(--icds-card-bg) !important;
+    border: 1px solid var(--icds-border) !important;
+}
+.modal-header, .modal-footer {
+    border-color: var(--icds-border) !important;
+    background-color: var(--icds-card-bg) !important;
+}
+.btn-close { filter: invert(1); }
+
+/* --------------------
+   Operator UI (Hero & Voice Panel)
+   -------------------- */
+.icds-hero {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+.icds-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.icds-hero p {
+    font-size: 1rem;
+    color: var(--icds-text-muted);
+}
+
+.icds-voice-panel {
+    background-color: var(--icds-card-bg);
+    border: 1px solid var(--icds-border);
+    border-radius: 16px;
+    max-width: 700px;
+    margin: 0 auto 50px auto;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.icds-mic-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background-color: var(--icds-bg);
+    border: 1px solid var(--icds-border);
+    color: var(--icds-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.icds-mic-btn:hover { background-color: #222; }
+.icds-mic-btn.active {
+    background-color: rgba(15, 157, 138, 0.1);
+    border-color: var(--icds-primary);
+    color: var(--icds-primary);
+}
+.icds-mic-btn svg { width: 24px; height: 24px; }
+
+.icds-transcript-area {
+    flex: 1;
+    font-size: 1.1rem;
+    color: var(--icds-text-muted);
+}
+.icds-transcript-area.has-text {
+    color: var(--icds-text);
+}
+
+.icds-submit-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: var(--icds-primary);
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.5;
+    pointer-events: none;
+    transition: all 0.2s;
+}
+.icds-submit-btn.ready {
+    opacity: 1;
+    pointer-events: auto;
+}
+.icds-submit-btn:hover { background-color: var(--icds-primary-hover); }
+
+/* Quick Actions (Recently Displayed) */
+.icds-quick-actions-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.icds-quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+.icds-quick-card {
+    background-color: var(--icds-card-bg);
+    border: 1px solid var(--icds-border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+.icds-quick-card:hover {
+    background-color: #1a1a1a;
+    border-color: #333;
+}
+.icds-quick-card-icon {
+    color: var(--icds-primary);
+    margin-bottom: 12px;
+}
+.icds-quick-card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+.icds-quick-card-subtitle {
+    font-size: 0.8rem;
+    color: var(--icds-text-muted);
+}
+.icds-empty-state {
+    text-align: center;
+    color: var(--icds-text-muted);
+    padding: 30px;
+    font-size: 0.9rem;
+}
+
+/* --------------------
+   Projection Display (Kept minimal per spec)
+   -------------------- */
+.icds-display-body {
+    background-color: var(--bg-display) !important;
+    color: var(--text-display) !important;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.icds-unlock-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.9); display: flex;
+    justify-content: center; align-items: center; z-index: 9999;
+}
+.icds-btn-unlock {
+    background-color: var(--icds-primary); color: #fff;
+    font-size: 24px; font-weight: 700; padding: 20px 40px;
+    border: none; cursor: pointer; border-radius: 8px;
+}
+.icds-display-container {
+    width: 100vw; height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; padding: 50px; box-sizing: border-box;
+}
+.icds-display-state { display: none; width: 100%; text-align: center; }
+.icds-display-state.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.icds-idle-text { font-size: 5vw; font-weight: 900; color: var(--text-display-muted); }
+.icds-idle-subtext { font-size: 3vw; color: #555555; }
+.icds-error-text { font-size: 6vw; font-weight: 900; color: var(--danger-color); }
+.icds-error-subtext { font-size: 4vw; color: var(--text-display-muted); }
+.icds-hymn-header { margin-bottom: 10px; }
+.icds-hymn-number {
+    display: none;
+}
+.icds-hymn-title { font-size: 6vw; font-weight: 900; margin: 0; line-height: 1.1; margin-bottom: 5px; text-align: center; }
+.icds-hymn-lyrics {
+    font-size: 4vw; font-weight: 500; line-height: 1.4; white-space: pre-wrap;
+    text-align: center; max-width: 90%; margin: 0 auto;
+}
+.icds-nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    padding: 15px 25px;
+    border-radius: 12px;
+    cursor: pointer;
+    z-index: 1000;
+    opacity: 0.6;
+    transition: opacity 0.3s, background-color 0.3s;
+}
+.icds-nav-btn:hover {
+    opacity: 1;
+}
+.icds-nav-left {
+    left: 40px;
+}
+.icds-nav-right {
+    right: 40px;
+}
