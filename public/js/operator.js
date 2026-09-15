@@ -36,9 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isListening) {
             recognition.stop();
         } else {
-            currentTranscript = '';
-            currentConfidence = 0;
-            transcriptDisplay.textContent = 'Listening...';
+            transcriptDisplay.value = '';
+            transcriptDisplay.placeholder = 'Listening...';
             transcriptDisplay.classList.remove('has-text');
             feedbackDisplay.style.display = 'none';
             submitBtn.classList.remove('ready');
@@ -72,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const displayTxt = finalTranscript || interimTranscript;
         if (displayTxt) {
-            transcriptDisplay.textContent = displayTxt;
+            transcriptDisplay.value = displayTxt;
             transcriptDisplay.classList.add('has-text');
             currentTranscript = displayTxt;
             submitBtn.classList.add('ready');
@@ -84,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setStatus('error', `Error: ${event.error}`);
         isListening = false;
         listenBtn.classList.remove('active');
-        transcriptDisplay.textContent = 'Ask anything...';
+        transcriptDisplay.value = '';
+        transcriptDisplay.placeholder = 'Type or say a hymn number, title, or lyrics...';
         transcriptDisplay.classList.remove('has-text');
     };
 
@@ -97,14 +97,33 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // If we have text, keep it ready for submit
         if (!currentTranscript) {
-            transcriptDisplay.textContent = 'Ask anything...';
+            transcriptDisplay.value = '';
+            transcriptDisplay.placeholder = 'Type or say a hymn number, title, or lyrics...';
             transcriptDisplay.classList.remove('has-text');
         }
     };
 
     submitBtn.addEventListener('click', () => {
-        if (currentTranscript) {
-            sendVoiceCommand(currentTranscript, currentConfidence);
+        const text = transcriptDisplay.value.trim();
+        if (text) {
+            sendVoiceCommand(text, currentConfidence || 1.0);
+        }
+    });
+
+    transcriptDisplay.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const text = transcriptDisplay.value.trim();
+            if (text) {
+                sendVoiceCommand(text, 1.0);
+            }
+        }
+    });
+
+    transcriptDisplay.addEventListener('input', () => {
+        if (transcriptDisplay.value.trim()) {
+            submitBtn.classList.add('ready');
+        } else {
+            submitBtn.classList.remove('ready');
         }
     });
 
@@ -130,7 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Optional: reset input
                 currentTranscript = '';
-                transcriptDisplay.textContent = 'Ask anything...';
+                transcriptDisplay.value = '';
+                transcriptDisplay.placeholder = 'Type or say a hymn number, title, or lyrics...';
                 transcriptDisplay.classList.remove('has-text');
                 submitBtn.classList.remove('ready');
                 

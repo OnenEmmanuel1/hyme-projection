@@ -59,9 +59,10 @@ async function matchCommand(rawCommand) {
 
     for (const hymn of allHymns) {
         const titleLower = hymn.Title.toLowerCase();
+        const lyricsCleaned = hymn.Lyrics.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "").replace(/\n/g, " ");
         
         // Simple substring check first
-        if (titleLower.includes(searchString) || searchString.includes(titleLower)) {
+        if (titleLower.includes(searchString) || searchString.includes(titleLower) || lyricsCleaned.includes(searchString)) {
             return hymn;
         }
 
