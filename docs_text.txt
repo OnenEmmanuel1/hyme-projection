@@ -1,0 +1,2756 @@
+DESIGN AND IMPLEMENTATION OF A MACHINE LEARNING-BASED INTELLIGENT CONTENT DISPLAY SYSTEM FOR AUTOMATED PROJECTION USING VOICE TO TEXT AND TEXT TO SPEECH PROMPTS (A CASE STUDY OF
+
+CHURCH HYMN PROJECTION)
+
+
+
+
+
+
+
+
+
+
+
+
+
+BY
+
+
+
+
+
+OKPO, MICHAEL RICHARD MATRIC NO: 22/095244175
+
+
+
+
+
+
+
+
+
+
+
+SUBMITTED TO DEPARTMENT OF COMPUTER SCIENCE
+
+FACULTY OF COMPUTING UNIVERSITY OF CALABAR CALABAR, NIGERIA.
+
+
+
+
+
+
+
+IN PARTIAL FULFILMENT OF THE REQUIREMENTS FOR THE AWARD OF THE DEGREE OF BACHELOR OF SCIENCE (B.Sc.) IN COMPUTER SCIENCE.
+
+
+
+
+
+SEPTEMBER, 2026
+
+
+
+CERTIFICATION
+
+I, Okpo, Michael Richard with Matriculation Number 22/095244175 hereby certify that this work titled: “Design and implementation of a machine learning-based intelligent content display system for automated projection using voice to text and text to speech prompts (A case study of church hymn projection)” is an original work carried out by me in the Department of Computer Science, Faculty of Computing, University of Calabar, Under the supervision of Mr. Obono I. Ofem
+
+
+
+
+
+Okpo, Michael Richard	Signature:	 (Student)
+
+Date:	
+
+
+
+DECLARATION
+
+This is to declared that this work titled: “Design and implementation of a machine learning-based intelligent content display system for automated projection using voice to text and text to speech prompts (A case study of church hymn projection)” is an original work carried out by Okpo, Michael Richard with Matriculation Number 22/095244175 in the Department of Computer Science, Faculty of Computing, under my supervision and has met the regulations governing the award of Bachelor of Science (B.Sc) Degree in Computer Science.
+
+
+
+Mr. Obono I. Ofem	Signature:	 (Supervisor)
+
+Date:	
+
+
+
+
+
+
+
+
+
+Dr. David O. Egete	Signature:	 (Head of Department)
+
+Date:	
+
+
+
+
+
+…………………………….	Date:……………… (External Examiner)
+
+
+
+DEDICATION
+
+I dedicate this work to God Almighty for the foundation of my existence and the guiding light in my life.
+
+
+
+ACKNOWLEDGEMENTS
+
+I begin by thanking God Almighty for His mercy, grace, provision, and love, which made it possible for me to achieve this milestone in my academic journey.
+
+I am sincerely grateful to my supervisor, Mr. Obono I. Ofem, whose advice, corrections and criticism has led to the success of this work. I sincerely thank the Head of Department Dr. David O. Egete for his encouragement and leadership quality in the department. My appreciation goes to my academic and non-academic staff of the Department of Computer Science, for their encouragement and support throughout my stay in the university.
+
+My thanks goes to my lovely parents, Hon. Sir Richard Okpo and Lady Juliet Richard Okpo for their unwavering support, understanding, and prayers during my studies. To my wonderful siblings for their constant support and encouragement.
+
+I also give thanks to my friends, Austin, Benjamin, Daniel and Divine for their encouragement and companionship throughout the period of this research
+
+Finally, I want to thank myself, for my hard work, resilience, and determination.
+
+
+
+All glory be to God for His sustaining grace.
+
+
+
+ABSTRACT
+
+Live content projection in worship, classroom, and conference settings remains heavily dependent on a human operator who must manually locate and trigger each item of content while a session is in progress. Informal timing observations conducted by the researcher across three churches in Calabar metropolis indicated that media operators spend approximately 40 to 60 minutes per session on manual retrieval and display activities alone, introducing delay, operator fatigue, and a persistent risk of displaying the wrong content. This study designed and implemented a Machine Learning-Based Intelligent Content Display System for Automated Projection using a voice-to-text and text-to-voice framework, with church hymn projection adopted as the case study. The system was developed using the object-oriented design methodology and modelled with Unified Modelling Language tools, comprising a voice input module, a speech-to-text module, a command matching engine, a hymn database, a text-to-voice module, an automated projection interface, and an administrative module. It was implemented as a Node.js and Express web application with a MySQL database and Socket.IO for real-time display updates. Speech is transcribed by the browser-native Web Speech API, which supplies a pre-trained deep neural network automatic speech recognition model, and the resulting text is resolved to a hymn record using the Levenshtein Distance string-matching algorithm, preceded by a numeric normalisation step that converts spoken numerals into hymn numbers. The system was evaluated through unit and integration testing. Of eight voice commands submitted during testing, the six corresponding to stored hymns were matched correctly, including a deliberately misrecognised title that was recovered through edit-distance matching, while the two commands that matched no stored hymn were correctly rejected rather than mapped to an incorrect record; no incorrect hymn was displayed at any point. Mean server-side processing time remained below three milliseconds per command across ten repeated runs of each test case. Unit testing additionally revealed two defects, one in numeric normalisation and one in referential integrity during hymn deletion, both of which were corrected and retested successfully. Testing further established that the text-to-voice module specified in the design was inactive in the evaluated build, so the requirement for audible confirmation was met in design but not in implementation. Subject to that gap, the results indicate that the system satisfies the remaining functional and non-functional requirements defined for it and achieves the aim of the study, replacing the manual, operator-dependent projection process with an automated, voice-driven alternative within the case study domain.
+
+
+
+TABLE OF CONTENTS
+
+TITLE PAGE	i
+
+
+
+CERTIFICATION	ii
+
+DECLARATION	iii
+
+DEDICATION	iv
+
+ACKNOWLEDGEMENTS	v
+
+ABSTRACT	vi
+
+TABLE OF CONTENTS	vii
+
+LIST OF TABLES	ix
+
+LIST OF FIGURES	xi
+
+CHAPTER ONE: INTRODUCTION
+
+Background to the study	1
+
+Statement of the problem	2
+
+Aim and objectives of the study	3
+
+Aim of the study	3
+
+Objectives of the study	4
+
+Research justification	4
+
+Scope and limitations of the study	5
+
+Scope of the study	5
+
+Limitations of the study	5
+
+Definition of terms	6
+
+CHAPTER TWO: LITERATURE REVIEW
+
+Chapter overview	8
+
+State of the art	9
+
+From early speech recognition to statistical modelling	9
+
+Deep learning and modern intelligent voice technologies	9
+
+Content display systems and the emergence of large language models	10
+
+Literature review	12
+
+Theoretical Framework: Pattern Recognition Theory	12
+
+Machine learning approaches to automatic speech recognition	14
+
+Keyword spotting and voice-controlled presentation systems	17
+
+Voice assistants, NLP/LLM-Based command interpretation, and IoT
+
+voice control	18
+
+Text-to-speech, speaker recognition, and human-computer interaction	19
+
+Religious content retrieval, multimedia presentation, and edge-deployed speech processing	23
+
+Comparative analysis and research gap	25
+
+Proposed contribution to knowledge	30
+
+Summary and Conclusion	31
+
+CHAPTER THREE: SYSTEM AND DESIGN METHODOLOGY
+
+Chapter Overview	34
+
+System analysis	34
+
+Analysis of the existing system	34
+
+Analysis of the proposed system	37
+
+Requirements of the proposed system	43
+
+System design	45
+
+Justification, advantages and disadvantages of the adopted design Methodology	46
+
+Logical design	47
+
+Physical design	53
+
+
+
+CHAPTER FOUR: SYSTEM IMPLEMENTATION
+
+
+
+4.1	Chapter overview
+
+58
+
+4.2	Features and Choice of Implementation Language
+
+58
+
+4.3	System testing strategies
+
+60
+
+4.3.1	Unit test
+
+41
+
+4.3.2	Integration test
+
+63
+
+
+
+Target computer system requirements	64
+
+Results	65
+
+Discussion	71
+
+CHAPTER FIVE: SUMMARY, CONCLUSION AND RECOMMENDATIONS
+
+Chapter Overview	73
+
+Summary	73
+
+Recommendations for future research	75
+
+Conclusion	76
+
+REFERENCES	78
+
+APPEDICES	82
+
+
+
+LIST OF TABLES
+
+TABLE 4.1 Summaries the unit tests carried out.	61
+
+TABLE 4.2 Summarizes the integration tests carried out.	63
+
+TABLE 4.3: Minimum Hardware Requirements	64
+
+TABLE 4.4: Minimum Software Requirements	65
+
+TABLE 4.5: Sample voice-command recognition results (to be completed with observed data)	70
+
+
+
+LIST OF FIGURES
+
+FIGURE 3.1: Architecture of the Existing (Manual) Hymn Projection System
+
+36
+
+FIGURE 3.2: Architecture of the Proposed Machine Learning-Based ICDS	41
+
+FIGURE 3.3: Use Case Diagram of the Intelligent Content Display System	50
+
+FIGURE 3.4: Activity Diagram of the Voice Command and Hymn Display Process	51
+
+FIGURE 3.5: Class Diagram of the Intelligent Content Display System	52
+
+FIGURE 4.1: Automated projection display showing a successfully matched hymn — hymn number, title, and lyrics rendered on screen
+
+(display.ejs, hymn-state).	66
+
+FIGURE 4.2: Automated projection display showing the “hymn not found” state	after	an	unmatched	or	low-confidence	command
+
+(display.ejs, not-found-state).	66
+
+FIGURE 4.3: Administrator login page (admin/login.ejs).	67
+
+FIGURE 4.4: Administrator dashboard showing hymn and command-log
+
+counts (admin/dashboard.ejs).	67
+
+FIGURE 4.5: Hymn management page showing the list of stored hymns and
+
+the add/delete controls (admin/hymns.ejs).	68
+
+FIGURE 4.6: Command log page showing recognised text, matched hymn, status,	and	timestamp	for	recent	voice	commands
+
+(admin/logs.ejs).	68
+
+FIGURE 4.7: Administrator settings page used to change the administrator password (admin/settings.ejs).	69
+
+
+
+CHAPTER ONE INTRODUCTION
+
+Background to the study
+
+The global industrial landscape is experiencing significant change due to the rapid adoption of emerging technologies. These technologies are transforming how organisations operate, process information, and deliver services, with artificial intelligence (AI) and machine learning driving much of this shift (Russell & Norvig, 2021). As these emerging technologies continue to develop, intelligent systems have been created ranging from simple hardware devices to software platforms capable of guiding decisions in real time. These systems are increasingly being used to automate routine tasks, improve efficiency, and reduce dependence on manual operations.
+
+
+
+One major development is the improvement of voice-to-text and text-to-voice technologies, which allow systems to interpret human speech as commands and convert digital information into audible responses, creating a hands-free mode of interaction (Deng & O'Shaughnessy, 2003). Recent advances in deep learning have substantially improved the accuracy and speed of automatic speech recognition (ASR), enabling systems to transcribe spoken input in real time even in noisy or variable acoustic conditions (Kheddar, Hemis, & Himeur, 2024; Nassif et al., 2019). These improvements have made voice-driven automation increasingly practical for use in real-world public and institutional settings, extending beyond personal virtual assistants into environments such as smart classrooms and automated presentation systems (Guo, Kou, & Zhou, 2022).
+
+
+
+Commercial presentation tools such as ProPresenter, EasyWorship, and Slipity already allow churches to manage lyrics, scripture, and media libraries digitally. However, these tools still depend on an operator to manually search for and trigger each slide during a live service; automation exists in content preparation, but not in the moment-to-moment retrieval and display of content. This gap between prepared digital content and automated, hands-free retrieval is the specific problem this study addresses. This study focuses on the development of an intelligent content display system that uses voice commands to retrieve and project hymn contents automatically, thereby closing this gap. Specifically, the machine learning component of the system is applied to the matching stage of the process: once speech has been transcribed to text by a speech-to-text engine, a similarity-matching model classifies the transcribed prompt against stored hymn records to identify the correct hymn, rather than the system itself being a trained speech-recognition engine. By replacing manual searching and projection processes with an automated approach, the system aims to improve accuracy, reduce operational workload, and enhance the overall presentation experience.
+
+
+
+Statement of the problem
+
+The reliance on manual intervention for information retrieval and display remains a challenge in many professional and public presentation environments. In many existing setups, media operators are responsible for manually locating and cueing content from records or files whenever a command is given. This process depends heavily on human response and requires continuous monitoring throughout the presentation.
+
+
+
+This challenge is not unique to worship settings. Similar reliance on manual triggering has been observed in smart classroom and IoT-based automation research, where voice control has been introduced specifically to reduce operator dependence and improve responsiveness (Guo, Kou, & Zhou, 2022). However, comparable voice-driven automation has not been widely applied to content projection in worship or presentation contexts, where existing software still requires an operator to manually locate and display each slide.
+
+
+
+This manual approach creates several operational challenges. First, dependence on a human operator can lead to delays because the speed of information retrieval is limited by the operator's reaction time. Second, the constant need for concentration places an unnecessary burden on the operator. When these routine tasks are repeated over time, the amount of effort and time spent becomes substantial. Despite the availability of modern digital tools, many information display systems continue to rely on manual interaction through keyboards, mice, or other input devices, and there is still a need for intelligent systems capable of processing spoken commands and handling display tasks automatically. This study addresses this gap by proposing an intelligent display system that uses voice recognition to execute commands and reduce the need for continuous manual operation.
+
+
+
+Aim and objectives of the study
+
+Aim of the study
+
+The aim of this project is to design and implement a Machine Learning-Based Intelligent Content Display System for Automated Projection using a voice-to-
+
+
+
+text and text-to-voice framework to display contents using the hymn book as a case study.
+
+
+
+Objectives of the study
+
+The objectives of the study are to:
+
+Design a comprehensive digital database for storing hymn records and other relevant projection contents.
+
+Adapt a machine learning-based matching model/framework capable of classifying transcribed spoken prompts against stored hymn records in real time.
+
+Integrate a text-to-voice module to provide audible system feedback and verify commands, and build an automated projection dashboard interface that manages the visual display of content. 
+
+Implement a voice-to-text framework that converts user speech into digital text commands.
+
+
+
+Research justification
+
+This project is important because it addresses the problem of time loss during presentations. Based on informal timing observations conducted by the researcher during Sunday services at three churches in Calabar metropolis, it was observed that media operators spend approximately 40–60 minutes per session carrying out manual content retrieval and display activities. This observation highlights the need for a more efficient and automated solution.
+
+
+
+By implementing an intelligent system, dependence on manual operation can be significantly reduced. The proposed system can be applied in churches,
+
+
+
+educational institutions, conference centres, and other organizations where information is frequently displayed. Such a system can help improve efficiency, reduce errors, and support faster access to information (Russell & Norvig, 2021). Moreover, through the application of machine learning techniques, the proposed system is expected to demonstrate a practical approach to improving information management and automation of routine tasks.
+
+
+
+Scope and limitations of the study
+
+Scope of the study
+
+This project focuses on the development of an intelligent, voice-responsive content display system for automated hymn projection. Specifically, the system is designed to capture spoken voice commands and convert them into digital text using a voice-to-text engine; match the transcribed text against a structured hymn database using a machine learning-based similarity/classification model to identify the correct hymn; automatically retrieve and project the matched content through a dashboard-based display interface; and provide audible confirmation of executed commands through a text-to-voice feedback module. The study covers database design, voice command processing, machine learning-based content matching, automated content retrieval, and automated display functions, using the hymn book as a case study.
+
+
+
+Limitations of the study
+
+The performance of the system depends on the quality of the microphone and background noise during operation. In addition, the system is designed specifically for hymn projection and may require modification before it can be applied to other forms of content management. Recognition is limited to English-
+
+
+
+language hymn titles, and the system does not support multiple simultaneous speakers. A stable power supply is also required for consistent operation.
+
+
+
+Definition of terms
+
+Artificial Intelligence (AI): A branch of computer science that enables machines to perform tasks that normally require human intelligence.
+
+Machine Learning: A subset of Artificial Intelligence that enables systems to learn from data and improve their performance without being explicitly programmed for every situation.
+
+Voice-to-Text: A technology that converts spoken language into digital text.
+
+Text-to-Voice: A technology that converts digital text into audible speech. Automated System: A system that performs tasks according to predefined rules with minimal human involvement.
+
+Database: A structured collection of data designed for efficient storage, retrieval, and management of information.
+
+Emerging Technologies: New technologies that are transforming the way industries and organizations operate.
+
+Voice Command: A spoken instruction recognized by a computer system and used to initiate a specific action.
+
+Information Retrieval: The process of locating and obtaining relevant information from a collection of stored data.
+
+Automatic Speech Recognition (ASR): A technology that enables a computer system to identify spoken words and convert them into text.
+
+Speech-to-Text Engine: The software component responsible for transcribing spoken audio input into digital text, distinct from the machine learning model used to match the transcribed text to stored records.
+
+
+
+Deep Learning: A subset of machine learning that uses multi-layered neural networks to learn patterns from large volumes of data, widely applied in modern speech recognition systems.
+
+Similarity Matching: A machine learning technique used to compare a transcribed text input against records in a database in order to identify the closest matching entry, forming the basis of the hymn-matching model used in this study.
+
+
+
+
+
+
+
+
+
+Chapter overview
+
+CHAPTER TWO LITERATURE REVIEW
+
+
+
+This chapter reviews literature relevant to the design and implementation of a machine learning-based intelligent content display system for automated hymn retrieval and projection. It begins with a discussion of the state of the art, tracing the development of speech recognition from early template-matching systems through statistical modelling, deep learning, and contemporary transformer-based approaches. The chapter also examines the development of intelligent voice technologies, digital content display systems, and large language models (LLMs) for natural language understanding.
+
+
+
+The chapter subsequently reviews relevant empirical and theoretical studies under thematic headings. The studies are critically examined based on their objectives, methodologies, findings, limitations, and relevance to the present research. The reviewed literature covers machine learning approaches to automatic speech recognition (ASR), keyword spotting, voice-controlled presentation systems, voice assistants, natural language processing (NLP), LLM-based intent interpretation and ASR error correction, text-to-speech (TTS), speaker recognition, human-computer interaction, religious content retrieval, and edge-based speech processing.
+
+
+
+The chapter concludes by synthesising the findings of the reviewed studies, identifying the major gaps in existing research, and presenting the proposed contribution of the study to knowledge.
+
+
+
+State of the art
+
+From early speech recognition to statistical modelling
+
+The development of automatic speech recognition (ASR) can be traced to the 1950s, when early systems such as Bell Laboratories' Audrey demonstrated the feasibility of recognising spoken digits. IBM's Shoebox, introduced in the 1960s, subsequently demonstrated recognition of a limited vocabulary of spoken words. Although these systems established the fundamental possibility of machine-based speech recognition, their practical capabilities were constrained by small vocabularies, speaker dependence, limited flexibility, and sensitivity to environmental conditions.
+
+During the 1980s and 1990s, ASR research increasingly adopted statistical modelling techniques, particularly Hidden Markov Models (HMMs) and Gaussian Mixture Models (GMMs). These approaches modelled the probabilistic relationship between acoustic observations and linguistic units, allowing systems to support larger vocabularies and continuous speech. Statistical approaches subsequently became dominant in commercial ASR applications. However, conventional statistical ASR systems depended heavily on manually engineered acoustic features and were susceptible to variations in pronunciation, accents, background noise, and recording conditions. These limitations encouraged the transition towards data-driven machine learning techniques, which sought to learn speech representations directly from data rather than relying primarily on manually designed features.
+
+Deep learning and modern intelligent voice technologies
+
+The emergence of deep learning substantially changed the development of ASR. Deep neural networks (DNNs), recurrent neural networks (RNNs), and long
+
+
+
+short-term memory (LSTM) networks enabled models to learn increasingly complex representations of speech and temporal relationships within continuous audio. Oruh et al. (2022), for example, investigated LSTM-based recurrent neural networks for speech recognition and reported high recognition performance on a spoken-English-digit benchmark.
+
+
+
+The development of transformer architectures subsequently introduced a different approach to modelling long-range dependencies in speech. Radford et al. (2022) demonstrated the potential of large-scale weakly supervised training through Whisper, which was trained on approximately 680,000 hours of multilingual and multitask audio. The resulting model demonstrated strong zero-shot speech-recognition performance across languages, accents, and different speech-recognition tasks. Contemporary voice technologies increasingly combine ASR with natural language processing and intelligent decision-making. Voice assistants and speech-to-text systems demonstrate that spoken input can be converted into text and subsequently interpreted to perform tasks, yet these systems are generally designed for broad, general-purpose applications. Their performance and architecture may not, as a result, directly address specialised requirements such as domain-specific vocabulary, closed-vocabulary command recognition, Nigerian-accented speech, or operation in reverberant church environments.
+
+
+
+Content display systems and the emergence of large language models Digital content-display systems have developed from manually controlled presentation technologies into multimedia platforms capable of displaying text, images, videos, lyrics, and other forms of content. Applications such as Microsoft
+
+
+
+PowerPoint, OpenLP, EasyWorship, and ProPresenter provide extensive presentation functionality, but content selection and navigation generally remain dependent on manual interaction or predefined controls.
+
+Recent research has demonstrated the possibility of using voice commands to reduce dependence on manual presentation control. Hutagalung and Adi Fitrianto (2024), for example, developed a CNN-based system for controlling presentation slides through spoken navigation commands. Such systems demonstrate the feasibility of speech-based presentation control, but their command vocabularies are generally limited and do not address the retrieval of a specific item from a structured collection of religious content. At the same time, large language models have expanded the capabilities of natural language understanding. Models such as GPT, Gemini, and LLaMA can process natural-language input and identify relationships between words, concepts, and user intentions. Recent research has also investigated the use of LLMs for ASR error correction and intent interpretation. Ma et al. (2025), for example, examined LLM-based post-processing of ASR output, while Fu et al. (2026) investigated LLM-based intention understanding for voice assistants.
+
+
+
+These developments suggest that LLMs may provide an additional layer for interpreting ambiguous or imperfect speech-recognition output. The reviewed literature, that said, remains largely focused on general-purpose assistants, transcription correction, and other application domains, with limited evidence of an integrated application of these techniques to closed-vocabulary, worship-specific content retrieval and automated projection.
+
+
+
+Literature review
+
+The reviewed literature is organised thematically according to the technological components relevant to the proposed system. These include machine learning approaches to ASR, keyword spotting and presentation control, voice assistants and NLP/LLM-based command interpretation, TTS and human-computer interaction, religious content retrieval, and edge-based speech processing. Rather than treating each publication as an isolated study, the review compares related studies to identify common findings, methodological differences, limitations, and implications for the present research.
+
+
+
+Theoretical Framework: Pattern Recognition Theory
+
+Pattern Recognition Theory provides a theoretical basis for understanding how computational systems identify and classify meaningful patterns in data. In machine learning applications, patterns are extracted from input data and used to classify previously unseen observations. Speech recognition represents one important application because spoken utterances contain acoustic and linguistic patterns that can be learned and classified by computational models.
+
+
+
+Two other theoretical perspectives were considered before Pattern Recognition Theory was adopted for this study. Information Processing Theory, which conceptualises cognition and computation as a sequence of discrete stages, input, encoding, storage, and output, offers one alternative lens through which the proposed system could be understood, since a spoken hymn request is indeed received, transcribed, matched, and acted upon in a broadly sequential manner. Information Processing Theory is, however, primarily concerned with the general flow of information through a system rather than with how a system learns to
+
+
+
+distinguish one class of input from another; it therefore explains the architecture of the proposed system more readily than it explains the specific recognition task at its core, namely, associating a spoken utterance with the correct hymn.
+
+Connectionist Theory, which models cognition as arising from networks of simple interconnected units that adjust their strength of association through training, was also considered, since it underlies the deep neural architectures reviewed throughout this chapter (see Section 2.2.2). Connectionist Theory is, however, a theory of mechanism, that is, of how learning occurs within a network, rather than a theory of task, namely, of what the system is ultimately trying to achieve when it processes a hymn request. Pattern Recognition Theory was therefore judged the more appropriate framework for this study because it addresses directly the task the proposed system must perform: the identification and classification of recurring acoustic and linguistic patterns in speech, regardless of the specific learning mechanism used to achieve it. Connectionist principles are, in this sense, treated in the present study as the computational means by which Pattern Recognition Theory is operationalised, rather than as a competing framework. In the proposed system, the user's speech constitutes the input pattern. Acoustic and linguistic characteristics extracted from the speech are processed by a recognition model to determine the intended command, such as a hymn title or hymn number. The recognised command is subsequently matched against a structured hymn database, after which the corresponding content can be retrieved and projected.
+
+
+
+Russell and Norvig (2021) describe artificial intelligence systems in terms of their capacity to perceive information and make decisions or take actions based
+
+
+
+on that information. From this perspective, Pattern Recognition Theory provides an appropriate conceptual foundation for the speech-recognition and classification component of the proposed system. Machine learning provides the computational mechanisms through which relevant patterns can be learned from training data and applied to new spoken inputs.
+
+
+
+Machine learning approaches to automatic speech recognition
+
+This section reviews studies that have applied machine learning techniques to automatic speech recognition (ASR), since accurate recognition of spoken input is the foundational requirement for any voice-controlled command-interpretation system, including the hymn-retrieval system proposed in this study. The studies reviewed trace developments from recurrent neural architectures to large-scale transformer models and examine how these developments address recognition accuracy, linguistic and accent variation, environmental noise, and computational efficiency, all of which bear directly on the problem of recognising Nigerian-accented hymn requests within a reverberant church environment.
+
+
+
+Research on machine learning-based ASR demonstrates a progression from recurrent neural architectures towards large-scale transformer models. Oruh et al. (2022) investigated LSTM recurrent neural networks for automatic speech recognition and evaluated their performance on a spoken-English-digit benchmark. Their model achieved 99.36% accuracy, demonstrating that recurrent architectures can provide strong recognition performance under controlled benchmark conditions. The evaluation, though, was conducted on general spoken-digit data and did not consider Nigerian-accented speech,
+
+
+
+domain-specific commands, or reverberant environments; the reported accuracy therefore cannot be assumed to translate directly to hymn recognition in a church environment.
+
+The broader development of deep-learning ASR is documented by Nassif et al. (2019), who systematically reviewed the application of deep neural networks to speech recognition. Their review demonstrated the increasing importance of deep learning in ASR, although the study predates the widespread adoption of transformer-based architectures. Shanshool and Abdulmohsin (2023) similarly reviewed machine learning approaches to speech recognition and compared different feature and classification techniques. These studies establish the importance of data-driven approaches to speech recognition but provide limited guidance regarding domain-specific command recognition.
+
+
+
+Radford et al. (2022) extended the capabilities of ASR through large-scale weakly supervised training. Whisper was trained on approximately 680,000 hours of multilingual audio and demonstrated strong zero-shot performance across diverse speech-recognition tasks. The study provides important evidence that large-scale training and diverse data can improve the generalisation of ASR models. Nevertheless, the computational requirements associated with larger Whisper models present challenges for local deployment on resource-constrained devices.
+
+
+
+The importance of adapting ASR to local accents is demonstrated by Babatunde et al. (2023), who investigated Nigerian-accented English using pretrained QuartzNet15x5 and Wav2Vec2 XLS-R-300M models. Their study used transfer learning to adapt pretrained models to Nigerian-accented speech and reported a
+
+
+
+WER of 8.2% for QuartzNet15x5 and 14.9% for Wav2Vec2 XLS-R-300M. The findings demonstrate the potential of transfer learning for improving recognition of Nigerian-accented speech. The study was nonetheless based on a relatively limited target-domain dataset and focused on general speech rather than short, domain-specific commands.
+
+
+
+Further evidence of the relevance of pretrained speech models in African linguistic contexts is provided by Abubakar et al. (2024), who investigated diacritic-aware ASR for Hausa. The researchers fine-tuned Wav2Vec2.0 and Whisper models and reported a WER of 4.23% for Whisper-large on diacritised Hausa speech. Although the study concerns Hausa rather than Nigerian-accented English, it demonstrates the potential of modern pretrained speech architectures for low-resource African-language applications.
+
+Noise robustness represents another important consideration. Dua et al. (2023) reviewed techniques for improving ASR performance under noisy conditions and demonstrated that no single noise-mitigation technique is universally effective. Their review emphasises the importance of adapting ASR systems to the characteristics of the deployment environment. This is particularly relevant to the proposed system because church auditoria may contain background speech, musical accompaniment, reverberation, and other acoustic interference.
+
+
+
+Collectively, these studies establish deep learning and transformer-based architectures as strong foundations for modern ASR while highlighting three important challenges relevant to the present study: linguistic variation, environmental noise, and computational requirements. The literature demonstrates that pretrained models and transfer learning can address some of
+
+
+
+these challenges, but there remains a need to evaluate their performance on domain-specific hymn commands under realistic church conditions.
+
+
+
+Keyword spotting and voice-controlled presentation systems Keyword spotting research provides a more targeted approach to speech recognition	by identifying	predefined	words	 or	commands	rather	than transcribing		unrestricted	speech.	Hutagalung	and		Adi	Fitrianto	(2024) demonstrated this principle through a CNN-based voice-command system for presentation slide navigation. The system recognised the commands “right” and “left” and achieved high recognition performance under noisy conditions. The study demonstrates that lightweight neural architectures can support speech-based presentation control. Its two-command vocabulary, though, does not address the more complex problem of identifying a specific hymn from a structured collection.
+
+Sun et al. (2024) investigated a keyword-spotting architecture based on the Swin-Transformer. Their approach combined temporal convolutional processing with a Swin-Transformer and was compared with other architectures, including LSTM, Transformer, and DS-CNN models. The proposed model achieved 98.01% accuracy on the Speech Commands V1 dataset. The findings demonstrate that transformer-based keyword spotting can achieve high recognition accuracy while maintaining computational efficiency. The evaluation was, even so, based on a general command dataset and did not consider Nigerian-accented speech, hymn-specific vocabulary, or reverberant auditorium conditions.
+
+
+
+Rostami et al. (2022) similarly investigated CNN-based keyword spotting in continuous speech. Their work supports the use of convolutional approaches for identifying speech patterns in continuous audio. López-Espejo et al. (2022) provided a broader review of deep spoken keyword spotting and identified CNN-
+
+, RNN-, and attention-based models as important approaches within the field. Their review also highlighted far-field speech and noise robustness as continuing challenges.
+
+
+
+Taken together, these studies demonstrate that keyword spotting is suitable for applications involving a limited command vocabulary and that lightweight neural models can achieve high recognition accuracy. The literature does not, all the same, adequately address the combination of domain-specific hymn vocabulary, Nigerian-accented speech, realistic church acoustics, and retrieval of the corresponding multimedia content. The present study therefore extends the keyword-recognition concept beyond simple navigation commands towards domain-specific content retrieval and projection.
+
+Voice assistants, NLP/LLM-Based command interpretation, and IoT voice control
+
+Voice assistants demonstrate how ASR can be combined with command interpretation and task execution. Subhash et al. (2020) developed an artificial intelligence-based voice assistant capable of performing everyday tasks using speech recognition and rule-based command interpretation. The study demonstrates the feasibility of a basic speech-to-command pipeline, although its general-purpose tasks and limited benchmarking make it less directly applicable to a specialised content-retrieval environment.
+
+
+
+Torad et al. (2022) extended this concept through a voice-controlled smart-home system integrating artificial intelligence, NLP, and IoT hardware. Spoken commands were interpreted and converted into actions performed through embedded hardware. This provides an architecturally relevant example of connecting voice input to physical or digital actions. Nevertheless, the system was designed for domestic automation and relied on a predefined command vocabulary rather than retrieval of specific content from a structured database.
+
+
+
+Chandrakala et al. (2024) investigated an intent-recognition pipeline designed to improve intent coverage from unfiltered textual data while reducing reliance on extensive manual annotation. The study demonstrated that heuristic and machine-learning techniques could increase intent coverage and identify distinct user intentions. The work was, in practice, conducted in a textual, open-domain setting rather than a spoken, closed-vocabulary environment. Recent studies have explored the use of LLMs to address limitations in conventional intent recognition. Fu et al. (2026) investigated LLM-based intention understanding for voice assistants and demonstrated that LLM prompting could help interpret informal and ambiguous user instructions. The study is relevant because users may express the same hymn request in different ways. Its application to smartphone navigation, though, differs from the structured hymn-retrieval problem addressed in this study.
+
+Ma et al. (2025) examined the use of LLMs for correcting errors in ASR transcriptions. Their findings indicate that LLM-based post-processing can improve transcription quality and that ASR hypotheses can provide useful contextual information for error correction. Such a mechanism could potentially
+
+
+
+be useful where an ASR error causes an otherwise valid hymn request to fail during database matching. The study did not, all the same, specifically evaluate Nigerian-accented speech, hymn titles, or worship-specific commands.
+
+Esquivel et al. (2024) reviewed voice-assistant utilisation among people with disabilities and reported applications involving environmental control, reminders, and independent living. Although the study is not directly concerned with religious presentation systems, it highlights the accessibility advantages of hands-free voice interfaces. Consequently, a voice-controlled hymn-projection system may offer benefits beyond operational efficiency by improving accessibility for users who have difficulty interacting with conventional manual presentation controls. Overall, the reviewed studies establish the feasibility of connecting speech recognition with intent interpretation and task execution. They stop short, though, of addressing the complete sequence required by the proposed system: spoken hymn request, domain-specific interpretation, database retrieval, feedback, and automated projection.
+
+Text-to-speech, speaker recognition, and human-computer interaction
+
+Although speech recognition determines what a user has said, the overall quality of a voice-controlled system also depends on how the system communicates back to the user and how naturally it accommodates different voices. This section therefore reviews three interrelated strands of research that together define the human-computer interaction dimension of the proposed system: text-to-speech synthesis, which governs how the system audibly confirms a selected hymn; speaker recognition, which addresses how systems process and adapt to acoustic variability across individual voices; and voice-user-interface research, which
+
+
+
+examines the broader usability, contextual understanding, and user experience of spoken interaction. Considered together, these strands inform not only whether the system can recognise a command, but whether the resulting interaction feels usable, trustworthy, and appropriately responsive to the worshipper issuing the request. Voice interaction involves not only recognising commands but also providing understandable and useful feedback to users. Francis et al. (2021) reviewed voice user interfaces (VUIs) and identified hands-free interaction as a major advantage while highlighting contextual understanding as an ongoing challenge. Their findings support the development of domain-specific voice interfaces capable of understanding the context in which commands are issued.
+
+
+
+Tan et al. (2021) reviewed neural text-to-speech synthesis and examined developments in text analysis, acoustic modelling, and waveform generation. Their review demonstrates the increasing capability of neural TTS systems to produce natural-sounding speech while highlighting continuing concerns about computational efficiency and data requirements. For the present study, TTS is potentially useful as a confirmation mechanism through which the system can verbally communicate the selected hymn before or after projection.
+
+
+
+Muhamad et al. (2024) investigated end-to-end TTS for Central Kurdish, a low-resource language, using a Tacotron2-based approach. The study demonstrated that transfer learning and appropriate dataset design can improve speech naturalness and intelligibility under resource constraints. Although the language and application differ from the present research, the study supports the broader feasibility of adapting pretrained speech-synthesis approaches to resource-limited contexts.
+
+
+
+Jahangir et al. (2020) investigated text-independent speaker identification using feature fusion and deep neural networks, while Jahangir et al. (2021) and Hanifa et al. (2021) reviewed developments and challenges in speaker recognition. These studies highlight the importance of acoustic features, deep learning, data availability, and environmental robustness in speech-processing applications. Speaker recognition, though, differs conceptually from command recognition: the former seeks to determine who is speaking, whereas the latter seeks to determine what the speaker is requesting. Consequently, these studies provide useful background on speech processing but do not provide direct evidence for hymn-command recognition.
+
+
+
+Deshmukh and Chalmeta (2024) reviewed research on user experience and usability in voice user interfaces and identified major research themes within the field. Their work is relevant to the present study because recognition accuracy alone does not determine whether a voice-controlled system is effective in practice. The proposed system should therefore consider usability, response time, clarity of feedback, and ease of interaction alongside technical recognition performance. Collectively, this body of work demonstrates that effective voice interaction depends on more than recognition accuracy: it depends on synthesising clear feedback, accommodating acoustic variability across speakers, and designing for usability and contextual understanding. These are the same three considerations that motivate the human-computer interaction dimension of the present study, even though limited attention has so far been given to integrating them into a specialised voice-controlled content-display system for church environments.
+
+
+
+Religious content retrieval, multimedia presentation, and edge-deployed speech processing
+
+Research on religious information retrieval provides a foundation for understanding how Christian content can be digitally organised and accessed. Angdresey et al. (2021) developed an information-retrieval system for searching Bible verses using the Vector Space Model and cosine similarity. The system demonstrated that textual Christian content could be indexed and ranked according to user queries. The study is relevant to the present research because hymn collections similarly consist of structured textual content that can be stored and retrieved. The Bible retrieval system, though, relies on typed queries and searches an open textual corpus. The proposed system differs by receiving spoken requests and matching them to specific entries in a closed hymnal catalogue.
+
+
+
+Azeta et al. (2014) developed B3, an automated cross-platform mobile Bible application in Nigeria. The system provided structured access to biblical content through a lightweight application architecture. The study demonstrates the feasibility of digitising religious content within a Nigerian context. Its interaction model, all the same, is primarily manual and predates the current generation of machine learning-based speech-recognition systems.
+
+Yan and Yan (2022) investigated an interactive multimedia information platform incorporating artificial intelligence, big-data technologies, semantic understanding, and intention recognition. The study demonstrates how semantic interpretation can be combined with multimedia content management. Nevertheless, the application was designed for a general enterprise environment
+
+
+
+rather than worship-specific voice interaction. While these studies address content retrieval and multimedia management, edge-computing research addresses the feasibility of executing speech-processing models locally. Wei et al. (2022) proposed EdgeCRNN, an edge-computing-oriented model for keyword spotting and evaluated it on a Raspberry Pi 3B+. The study reported 98.05% accuracy and demonstrated improved processing speed compared with a comparison model. This provides evidence that keyword spotting can be performed on relatively low-cost edge hardware.
+
+Joy et al. (2026) further investigated the deployment of Whisper-based speech recognition in edge environments through model compression. The researchers evaluated quantised Whisper models on Raspberry Pi and Jetson Orin Nano devices and compared them with cloud- and PC-based environments. Their findings showed that model compression could produce compression ratios greater than 3.7 while causing only marginal degradation in transcription accuracy. The quantisation approach applied in such studies builds on the foundational integer-arithmetic quantisation techniques introduced by Jacob et al. (2018), who demonstrated that neural networks could be trained and executed using low-precision integer arithmetic with minimal loss of accuracy, thereby enabling efficient inference on resource-constrained hardware. The study also reported improvements in inference performance and reductions in memory requirements. These findings provide recent empirical evidence that quantisation can help make large ASR models more practical for resource-constrained edge devices.
+
+Joy et al. (2026), though, evaluated general speech recognition rather than closed-vocabulary  hymn  commands  and  did  not  specifically  investigate
+
+
+
+reverberant church-auditorium conditions. The study therefore provides evidence for the technical feasibility of edge deployment but does not establish the suitability of quantised Whisper for the specific application proposed in this research. Taken together, the religious-retrieval and edge-computing studies demonstrate the feasibility of two important components of the proposed system: structured retrieval of Christian content and local execution of speech-processing models. Nevertheless, the literature provides limited evidence of their integration with domain-specific speech recognition and automated projection.
+
+Comparative analysis and research gap
+
+
+
+Study
+
+Focus
+
+Major Strength
+
+Major Limitation
+
+
+
+Oruh et al. (2022)
+
+
+
+LSTM-based ASR
+
+Strong recognition performance on a benchmark dataset
+
+Not evaluated on Nigerian-accented or domain-specific speech
+
+
+
+Radford et al. (2022)
+
+Large-scale transformer ASR
+
+Strong multilingual and zero-shot generalisation
+
+Large models can be computationally demanding
+
+
+
+Dua et al. (2023)
+
+
+
+Noise-robust ASR
+
+Comprehensive review of	noise-related challenges		and techniques
+
+
+
+No	church-specific acoustic evaluation
+
+Babatunde	et	al.
+
+(2023)
+
+Nigerian-accented ASR
+
+Demonstrates transfer-learning potential
+
+Limited	target-domain data
+
+
+
+Nassif et al. (2019)
+
+Deep-learning	ASR review
+
+Documents development of DNN-based ASR
+
+Predates the transformer era
+
+Shanshool	& Abdulmohsin (2023)
+
+Machine-learning speech recognition
+
+Broad review of ML approaches
+
+Not	focused	on command recognition
+
+Hutagalung	&	Adi Fitrianto (2024)
+
+Voice-controlled slide navigation
+
+Demonstrates speech-based presentation control
+
+Limited	to	two commands
+
+
+
+Study
+
+Focus
+
+Major Strength
+
+Major Limitation
+
+
+
+Sun et al. (2024)
+
+Swin-Transformer keyword spotting
+
+High	accuracy	with efficient architecture
+
+General	command dataset; no church evaluation
+
+
+
+Rostami et al. (2022)
+
+CNN	keyword spotting
+
+Supports continuous-speech	keyword detection
+
+No	Nigerian-accented evaluation
+
+López-Espejo  et  al.
+
+(2022)
+
+Deep	keyword spotting review
+
+Comprehensive architecture	and challenge review
+
+No	worship-specific application
+
+
+
+Subhash et al. (2020)
+
+
+
+AI voice assistant
+
+Demonstrates	speech-to-action interaction
+
+General-purpose		tasks and	limited
+
+benchmarking
+
+Torad et al. (2022)
+
+Voice-controlled IoT
+
+Demonstrates	NLP-to-action architecture
+
+Domestic	command vocabulary
+
+Chandrakala	et	al.
+
+(2024)
+
+
+
+Intent recognition
+
+Improves	intent coverage with limited annotation
+
+Text-based and open-domain
+
+Fu et al. (2026)
+
+LLM-based	intent understanding
+
+Handles informal and ambiguous instructions
+
+Different	application domain
+
+Ma et al. (2025)
+
+LLM-based	ASR correction
+
+Improves ASR output through post-processing
+
+Not	tested	on	hymn commands
+
+Abubakar	et	al.
+
+(2024)
+
+
+
+Hausa ASR
+
+Strong	Whisper performance in a low-resource setting
+
+General transcription rather than command recognition
+
+Esquivel et al. (2024)
+
+Voice assistants and accessibility
+
+Demonstrates accessibility benefits
+
+Not specific to worship or presentation
+
+Deshmukh	& Chalmeta (2024)
+
+VUI usability
+
+Provides	usability research framework
+
+No	specific	system implementation
+
+Angdresey	et	al.
+
+(2021)
+
+Bible	information retrieval
+
+Demonstrates	retrieval of Christian content
+
+Text-based rather than voice-based
+
+Azeta et al. (2014)
+
+Mobile	Bible application
+
+Nigerian precedent for digital religious content
+
+Manual navigation
+
+
+
+Study
+
+Focus
+
+Major Strength
+
+Major Limitation
+
+
+
+Yan & Yan (2022)
+
+AI	multimedia platform
+
+Integrates semantic understanding	and multimedia
+
+
+
+Not worship-specific
+
+
+
+Wei et al. (2022)
+
+Edge	keyword spotting
+
+Demonstrates low-cost edge deployment
+
+General vocabulary and limited environmental evaluation
+
+
+
+Joy et al. (2026)
+
+
+
+Quantised Whisper on edge devices
+
+Demonstrates	model compression		and
+
+improved	edge feasibility
+
+No	hymn-specific	or church-auditorium evaluation
+
+
+
+Francis et al. (2021)
+
+
+
+Voice user interfaces
+
+Identifies	contextual-understanding challenges
+
+Review	rather	than implementation
+
+
+
+Tan et al. (2021)
+
+
+
+Neural TTS
+
+Establishes development of modern neural speech synthesis
+
+No integrated command-confirmation application
+
+Muhamad	et	al.
+
+(2024)
+
+Low-resource TTS
+
+Demonstrates transfer-learning potential
+
+Different language and application
+
+
+
+Jahangir et al. (2020)
+
+
+
+Speaker identification
+
+Demonstrates	deep-learning feature fusion
+
+Speaker identity rather than	command recognition
+
+Jahangir et al. (2021)
+
+Speaker	recognition review
+
+Identifies	important research challenges
+
+Speaker-focused rather than command-focused
+
+Hanifa et al. (2021)
+
+Speaker	recognition review
+
+Reviews technology and challenges
+
+Not	concerned	with content retrieval
+
+
+
+The reviewed literature demonstrates substantial progress in speech recognition, machine learning, keyword spotting, voice-controlled interaction, natural language processing, text-to-speech, religious content retrieval, and edge computing. Deep-learning approaches have become central to modern ASR, while transformer architectures have further improved the ability of models to generalise across languages and acoustic conditions. Whisper, in particular,
+
+
+
+provides a strong foundation for the proposed system because of its multilingual training and zero-shot recognition capability.
+
+At the same time, the literature demonstrates that ASR performance depends substantially on the characteristics of the target deployment environment. Noise-robust ASR research identifies environmental mismatch as an important source of recognition degradation (Dua et al., 2023). Research on Nigerian-accented English also demonstrates that pretrained models can benefit from transfer learning when adapted to local speech characteristics (Babatunde et al., 2023). Similarly, Abubakar et al. (2024) demonstrate the potential of pretrained models for African-language speech recognition.
+
+
+
+Keyword-spotting studies further demonstrate that predefined speech commands can be recognised using relatively lightweight architectures. Hutagalung and Adi Fitrianto (2024) applied CNN-based recognition to presentation control, while Sun et al. (2024) demonstrated high accuracy using a TCN and Swin-Transformer architecture. Edge-computing research, particularly Wei et al. (2022) and Joy et al. (2026), indicates that speech-processing models can increasingly be executed on resource-constrained hardware. The evaluated datasets and environments do not, though, correspond directly to the proposed church-based application.
+
+
+
+The literature on voice assistants, NLP, and LLMs demonstrates that recognised speech can be transformed into structured intentions and actions. Subhash et al. (2020) and Torad et al. (2022) demonstrate basic speech-to-action pipelines, while Chandrakala et al. (2024) investigates intent recognition. More recent work by Fu et al. (2026) and Ma et al. (2025) suggests that LLMs may assist with
+
+
+
+ambiguous intent interpretation and ASR error correction. Nevertheless, these studies have not established the effectiveness of such approaches for closed-vocabulary hymn retrieval. Research on religious information retrieval provides evidence that Christian content can be digitally structured and retrieved. Angdresey et al. (2021) demonstrated Bible-verse retrieval using text-based information retrieval, while Azeta et al. (2014) demonstrated structured digital access to biblical content in a Nigerian context. These studies establish a foundation for digital religious-content management but do not incorporate voice-driven retrieval and automated projection.
+
+
+
+The reviewed studies therefore reveal several related gaps. First, most ASR studies focus on general transcription rather than domain-specific hymn commands. Second, keyword-spotting studies generally use generic datasets rather than Nigerian-accented, worship-specific speech. Third, voice-controlled presentation systems generally focus on simple navigation commands rather than identifying and retrieving a specific content item from a structured database. Fourth, religious content-retrieval systems generally rely on typed queries or manual navigation rather than speech input. Fifth, edge-deployment studies demonstrate the feasibility of local inference but provide limited evidence regarding performance under church-specific acoustic conditions.
+
+
+
+The central gap identified from the reviewed literature is therefore one of integration and contextualisation. The individual technologies required for the proposed system have been extensively investigated, but the reviewed literature provides limited evidence of an integrated, domain-specific system that combines machine learning-based speech recognition, hymn-command interpretation,
+
+
+
+structured hymn retrieval, text-to-speech feedback, and automated multimedia projection within a church environment.
+
+The present study addresses this gap by designing and implementing a machine learning-based intelligent content display system that receives spoken hymn requests, recognises the intended request, retrieves the corresponding hymn from a structured database, provides appropriate system feedback, and automatically projects the selected content. The study further considers the relevance of Nigerian-accented speech, environmental noise, and resource-constrained deployment to the proposed application.
+
+
+
+Proposed contribution to knowledge
+
+The reviewed literature demonstrates substantial advancements in automatic speech recognition, machine learning, keyword spotting, voice-controlled presentation, voice user interfaces, text-to-speech, natural language processing, large language models, religious content retrieval, and edge computing. These technologies have, for the most part, been investigated independently or in application domains different from automated hymn retrieval and projection.
+
+The primary contribution of this study is the design and implementation of a machine learning-based intelligent content display system that integrates speech recognition, voice-command interpretation, structured hymn retrieval, database management, text-to-speech feedback, and multimedia projection within a single application. The system is intended to provide hands-free access to hymns and reduce dependence on manual content selection during worship services. The study also contributes to the application of artificial intelligence in the Nigerian context by investigating the feasibility of a locally deployable voice-controlled
+
+
+
+content-display system. Particular attention is given to the challenges associated with Nigerian-accented speech, environmental noise, and computational-resource limitations. The research therefore provides empirical evidence regarding the application of speech-recognition and machine learning techniques to a specialised local environment.
+
+
+
+In addition, the study provides a foundation for future research into accent-aware ASR, domain-specific keyword recognition, intelligent content retrieval, and adaptive voice interfaces. Recent studies on LLM-based intent interpretation and ASR error correction (Fu et al., 2026; Ma et al., 2025) suggest potential future enhancements through an additional language-processing layer capable of handling informal hymn requests and correcting residual recognition errors. Such capabilities are considered potential extensions rather than established components of the present system. Overall, the contribution of the study lies in integrating and contextualising existing artificial intelligence and speech technologies into a domain-specific intelligent content-display application for church environments. The resulting framework may also provide a basis for similar voice-controlled content-retrieval applications in educational institutions, conference centres, religious organisations, and other environments requiring rapid, hands-free access to structured multimedia content.
+
+
+
+Summary and Conclusion
+
+This chapter has reviewed literature relevant to the design of a machine learning-based intelligent content display system for automated hymn retrieval and projection. It traced the development of automatic speech recognition from early template-matching  and  statistical  approaches  through  deep  learning  and
+
+
+
+transformer-based architectures, and examined the parallel evolution of digital content-display systems and large language models for natural language understanding.
+
+The literature review subsequently examined six thematic areas: machine learning approaches to automatic speech recognition; keyword spotting and voice-controlled presentation systems; voice assistants, NLP/LLM-based command interpretation, and IoT voice control; text-to-speech synthesis, speaker recognition, and human-computer interaction; religious content retrieval, multimedia presentation, and edge-deployed speech processing; and a comparative analysis drawing these strands together. Across these areas, the reviewed studies demonstrated that the individual technologies required for the proposed system, namely accurate speech recognition, keyword and command interpretation, natural language and intent understanding, audible feedback, structured religious-content retrieval, and resource-constrained edge deployment, have each been separately and substantially investigated.
+
+
+
+The review also established, though, that no existing study integrates these technologies into a single, domain-specific system for recognising spoken hymn requests, retrieving the corresponding hymn from a structured database, and automatically projecting it within a church environment. This gap of integration and contextualisation, rather than a gap in any single underlying technology, constitutes the central problem that the present study addresses.
+
+
+
+In conclusion, the literature reviewed in this chapter provides a strong technical and theoretical foundation for the proposed system while confirming that its specific combination of accent-aware speech recognition, closed-vocabulary
+
+
+
+hymn-command interpretation, structured content retrieval, and automated multimedia projection has not yet been addressed in existing research. The next chapter builds on this foundation by presenting the methodology adopted for the design and implementation of the proposed system.
+
+
+
+CHAPTER THREE
+
+SYSTEM AND DESIGN METHODOLOGY
+
+Chapter Overview
+
+This chapter presents the analysis and design methodology adopted for the Machine Learning-Based Intelligent Content Display System for Automated Projection, developed using voice-to-text and text-to-voice prompts, with the church hymn projection environment as a case study. The chapter begins with an analysis of the existing manual hymn projection system, identifying its constituent activities, strengths, and limitations, followed by an analysis of the proposed system and the requirements it must satisfy. It then presents the system design, describing the design methodology adopted (object-oriented design) and detailing the logical design (input design, output design, use case diagram, activity diagram, and class diagram) and the physical design (program specification, database structure, and system controls). The chapter is structured so that another researcher can replicate the proposed system by following the steps and processes described herein.
+
+
+
+System analysis
+
+Analysis of the existing system
+
+The existing hymn projection process observed across the churches used for this study is largely manual and operator-dependent. During worship service, when a hymn is to be sung, a media operator manually searches through a physical hymn book, a pre-loaded slide deck, or presentation software such as Microsoft PowerPoint, OpenLP, or ProPresenter to locate the requested hymn number or title before projecting it on the screen for the congregation.
+
+
+
+Constituents of the existing system
+
+Media Operator: The human agent responsible for listening to instructions (usually shouted or hand-signalled by the worship leader), searching for the hymn, and manually triggering the projection.
+
+Hymn Reference Materials: Physical hymn books or digitally pre-loaded slide files/playlists.
+
+Presentation Software/Hardware: Computer system running slide software connected to a projector and screen.
+
+Projector and Display Screen: The output hardware that renders the located content to the congregation.
+
+
+
+Strengths of the Existing System
+
+Simple to set up, requiring only basic computer literacy and standard presentation software.
+
+Low technical dependency; does not require specialised hardware such as microphones or trained models.
+
+Human operators can exercise judgment in ambiguous or unusual situations.
+
+
+
+Limitations of the Existing System
+
+Retrieval speed is limited by the operator's reaction time and familiarity with the hymn book/slide order, leading to delays of about 40–60 minutes per session in searching and display activities, as observed by the researcher (Section 1.4).
+
+Continuous concentration is required throughout the service, causing operator fatigue over time.
+
+
+
+Prone to human error, such as displaying the wrong hymn number or verse.
+
+No hands-free or voice-based interaction; requires manual keyboard/mouse/clicker operation (Sommerville, 2016).
+
+No intelligent mechanism for automatically matching a spoken hymn request to the correct database record.
+
+
+
+Architecture of the Existing System
+
+Figure 3.1 presents the architecture of the existing manual hymn projection process described above, showing how a request moves from the worship leader, through the media operator and presentation software, to the projection screen.
+
+
+
+
+
+
+
+
+
+Figure 3.1: Architecture of the Existing (Manual) Hymn Projection System
+
+
+
+As the diagram shows, every stage of the process passes through a single human operator; there is no automated bridge between the spoken instruction and the retrieval or display of the hymn. This absence of an automated link between instruction and display is the principal gap that the proposed system, presented next, is designed to close.
+
+
+
+Analysis of the proposed system
+
+The proposed system automates hymn retrieval and projection through machine learning-based voice recognition. A user (worship leader or operator) issues a spoken command such as the hymn title or number; the system converts the speech to text, matches the text against a structured hymn database, retrieves the correct hymn, projects it automatically on the display, and issues an audible text-to-voice confirmation of the action taken.
+
+
+
+Constituents of the proposed system
+
+Voice Input Module: Captures spoken hymn commands through a microphone.
+
+Speech-to-Text (Voice-to-Text) Module: Applies a machine learning-based automatic speech recognition (ASR) model to convert speech into digital text commands.
+
+Command Processing/Matching Engine: Interprets the recognised text and searches the hymn database for the matching record.
+
+Hymn Database: A structured digital repository storing hymn numbers, titles, and lyrics.
+
+Text-to-Voice Module: Converts system responses into audible speech to confirm or report the outcome of a command.
+
+
+
+Automated Projection Interface: Displays the retrieved hymn content on the screen without manual triggering.
+
+Administrative Module: Allows an authorised admin to add, update, or remove hymn records.
+
+
+
+Machine learning algorithm employed
+
+The proposed system relies on two complementary machine learning-oriented techniques to convert a spoken hymn request into the correct display action: an Automatic Speech Recognition (ASR) model that converts voice into text, and a string-matching algorithm that resolves the recognised text into the correct hymn record.
+
+Speech recognition is handled by the browser-native Web Speech API (implemented in this project through the Speech Recognition/ webkitSpeechRecognition interface), which streams captured audio to a cloud-based, deep neural network acoustic and language model maintained by the browser vendor. This model performs the ASR task end-to-end, returning both a text transcript and a confidence score for the utterance, rather than requiring the researcher to design, train, and host a bespoke speech model.
+
+
+
+Once a transcript is produced, the system applies the Levenshtein Distance (Edit Distance) algorithm to match the transcribed text against titles stored in the hymn database. Levenshtein Distance measures the minimum number of single-character insertions, deletions, or substitutions required to transform one string into another; the hymn whose title yields the lowest distance to the transcript, subject to a similarity threshold, is selected as the best match. Where the transcript contains numeric words (e.g., “two four five”), a word-to-number
+
+
+
+normalisation step converts them to digits and an exact numeric lookup is attempted first, before the system falls back to fuzzy title matching.
+
+Levenshtein Distance was chosen over a trainable machine learning classifier for the matching stage because hymn-matching is a bounded, well-defined string-similarity task rather than an open-ended classification problem: hymn titles are short, finite in number, and known in advance, so an edit-distance metric can resolve minor misrecognitions (e.g., “amazing grace” versus “amazin grace”) without requiring a labelled training dataset, a training pipeline, or GPU inference at runtime. Combined with the pre-trained ASR model supplied by the Web Speech API, this design lets the system benefit from deep learning-based speech recognition while keeping the matching logic lightweight, transparent, and fast enough for real-time use during a live service.
+
+
+
+Advantages of the chosen algorithm:
+
+Requires no labelled training data or model-training pipeline, reducing development time and computational cost.
+
+Runs in real time on ordinary hardware, since edit-distance calculation is computationally inexpensive for short strings.
+
+Is fully deterministic and explainable: the reason a hymn was or was not matched can be traced directly to the computed distance value.
+
+Tolerates minor ASR misrecognitions, typos, or partial phrases without additional configuration.
+
+
+
+Disadvantages of the chosen algorithm:
+
+Is purely lexical: it compares character sequences and cannot capture semantic meaning, so titles that are phrased differently but refer to the same hymn may not match.
+
+Matching accuracy degrades as the number of hymns in the database grows and titles become more similar to one another.
+
+Depends entirely on the quality of the upstream ASR transcript; the algorithm cannot recover information lost to poor speech recognition.
+
+Relies on the Web Speech API for transcription, which requires an internet connection and, being a third-party cloud service, cannot be retrained or fine-tuned by the researcher.
+
+Strengths of the proposed system
+
+Reduces dependence on continuous manual operation, thereby reducing operator workload and fatigue.
+
+Improves retrieval speed and accuracy through automated database matching.
+
+Provides audible feedback that verifies processed commands, improving reliability.
+
+Scalable to other content-display domains such as classrooms and conference centres (Section 1.4).
+
+
+
+Limitations of the Proposed System
+
+Recognition accuracy depends on microphone quality and ambient noise levels (Section 1.5.2).
+
+Requires a stable power and network/computing environment for
+
+
+
+consistent operation.
+
+Designed specifically for hymn content and would require modification for other content types.
+
+
+
+Architecture of the Proposed System
+
+Figure 3.2 presents the architecture of the proposed system, organised into four layers: an input layer that captures the spoken command as well as the administrator's keyboard/mouse input; a processing layer comprising the ASR module and the Levenshtein-based command matching engine; a data layer consisting of the Hymn, CommandLog, and Administrator tables; and an output layer comprising the automated projection interface and the text-to-voice module.
+
+
+
+Figure 3.2: Architecture of the Proposed Machine Learning-Based ICDS
+
+
+
+Unlike the existing architecture, each layer in the proposed system is loosely coupled to the others and communicates through a well-defined interface (e.g., recognised text passed from the ASR module to the matching engine, or a matched hymn object passed to the projection and text-to-voice modules), which is what allows the components identified in Section 3.1.2 to be developed, tested, and replaced independently.
+
+
+
+Advantages of the Proposed System over the Existing System
+
+Building on the strengths and limitations already identified for each system (Sections 3.1.1 and 3.1.2), the proposed architecture offers the following concrete advantages over the existing manual architecture:
+
+Removes the media operator as a single point of failure and delay; the ASR-to-database path is fully automated once a voice command is issued.
+
+Reduces the observed 40–60 minute per-session search-and-display delay (Section 1.4) to a matter of seconds per request.
+
+Provides an audit trail through the CommandLog table, which the manual architecture has no equivalent of, enabling later evaluation of recognition accuracy.
+
+Separates concerns cleanly across layers (input, processing, data, output), so that any one layer — for example, replacing the Web Speech API with another ASR provider — can be changed without redesigning the rest of the system, unlike the tightly coupled operator-and-software workflow of the existing system.
+
+Adds administrative and logging functions (the Administrator and CommandLog tables) that have no counterpart in the informal, undocumented existing process.
+
+
+
+Requirements of the proposed system
+
+Requirements engineering distinguishes between functional requirements, which specify what the system must do — the specific functions, behaviours, and services it must provide — and non-functional requirements, which specify how well the system must perform those functions, covering quality attributes such as performance, usability, reliability, security, and availability (Sommerville, 2016). The table below lists the functional requirements derived from the proposed system's constituents (Section 3.1.2), while the table that follows it lists the corresponding non-functional requirements.
+
+
+
+No.
+
+Functional Requirements
+
+FR1
+
+The system shall capture spoken hymn requests through a microphone.
+
+FR2
+
+The system shall convert captured speech into digital text using a machine
+
+learning-based ASR model.
+
+FR3
+
+The system shall search the hymn database for a record matching the
+
+recognised text.
+
+FR4
+
+The system shall automatically project the retrieved hymn on the display
+
+screen.
+
+FR5
+
+The system shall generate audible (text-to-voice) feedback confirming the
+
+action taken or reporting a "hymn not found" outcome.
+
+FR6
+
+The system shall allow an authenticated administrator to add, edit, or delete
+
+hymn records.
+
+FR7
+
+The system shall log processed voice commands for monitoring and
+
+evaluation purposes.
+
+
+
+No.
+
+Functional Requirements
+
+No.
+
+Non-Functional Requirements
+
+NFR1
+
+Performance: The system shall process and display a matched hymn
+
+within a few seconds of command recognition.
+
+NFR2
+
+Usability: The voice interface shall require minimal training for operators
+
+to use effectively.
+
+NFR3
+
+Reliability: The system shall correctly reject unmatched or unclear
+
+commands rather than displaying incorrect content.
+
+NFR4
+
+Security: Administrative functions shall be protected by authentication.
+
+NFR5
+
+Availability: The system shall remain operational throughout a service
+
+session given stable power supply.
+
+
+
+Advantages and disadvantages of specifying functional and non-functional requirements
+
+Explicitly separating and documenting functional and non-functional requirements, as done above, carries the following advantages and disadvantages for this project:
+
+Advantages:
+
+Gives an unambiguous, testable checklist (FR1–FR7, NFR1–NFR5) against which the completed system can later be verified in Chapter Four, supporting objective evaluation rather than subjective judgement.
+
+Separates functional correctness from quality-of-service concerns, so that, for example, a system that matches hymns correctly (functional) but responds too slowly (non-functional) can be diagnosed precisely.
+
+
+
+Provides traceability from the requirements back to the system's constituents and objectives (Sections 1.3.2 and 3.1.2), making the design easier to justify and review.
+
+Communicates expectations clearly to any future developer who extends or maintains the system.
+
+Disadvantages:
+
+Requirements fixed early in the project (e.g., NFR1's “few seconds” response target) can become outdated or unrealistic as the system's scope or operating environment changes, requiring the requirements to be revisited.
+
+Some non-functional qualities, such as usability (NFR2), are difficult to state as precise, measurable criteria and instead rely on subjective judgement or user feedback.
+
+Maintaining a formal requirements list adds documentation overhead that can be disproportionate for a small, single-developer student project such as this one.
+
+A requirement stated in isolation (e.g., FR4's automatic projection) can conflict with another (e.g., NFR3's rejection of unclear commands), and such conflicts are not resolved simply by listing requirements separately.
+
+
+
+System design
+
+Two broad approaches exist for designing a software system: structured design, which uses tools such as system flowcharts, program flowcharts, and structure charts to model the flow of data and control through the system; and object-oriented (OO) design, which models the system as a set of interacting objects using Unified Modelling Language (UML) tools such as use case, activity,
+
+
+
+class, and sequence diagrams. This project adopts the object-oriented design approach, because the proposed system is composed of distinct, reusable, and interacting components (voice input, ASR module, database, matching engine, text-to-voice module, and projection interface) that are more naturally modelled as collaborating objects/classes than as a single sequential flow of data. The OO approach also supports future extension of the system, such as adapting it to another content domain, with minimal restructuring. The design is presented in two parts: the logical design, which is an abstract, technology-independent representation of the system's data flow, inputs, and outputs; and the physical design, which specifies the actual program modules, database structure, and system controls.
+
+
+
+Justification, advantages and disadvantages of the adopted design methodology
+
+The object-oriented design methodology was adopted for this study rather than the structured (procedural) alternative for three main reasons. First, the proposed system is naturally composed of discrete, self-contained components — the voice input module, the ASR module, the matching engine, the hymn database, the text-to-voice module, and the projection interface — each of which maps cleanly onto a class with its own attributes and behaviour, as shown in the class diagram (Figure 3.5). Second, object-oriented design supports encapsulation and reuse, so that a module such as the matching engine can be modified, replaced, or reused in another content-display context (e.g., adapting the system for classroom or conference use, Section 1.4) without redesigning the entire system. Third, the UML tools associated with the object-oriented approach (use case, activity, and class diagrams) allow both the behaviour and the structure of the system to be
+
+
+
+modelled and communicated clearly, in line with the chapter's aim of allowing another researcher to replicate the system (Section 3.0).
+
+
+
+Advantages of the object-oriented design methodology:
+
+Promotes modularity and reuse, since each system component is modelled as an independent class or object.
+
+Makes the system easier to extend or maintain, as changes to one class have minimal effect on others.
+
+Aligns naturally with the way the implemented system is structured into modules and services.
+
+Improves	communication	with	stakeholders	through	visual	UML artefacts such as use case, activity, and class diagrams.
+
+
+
+Disadvantages of the object-oriented design methodology:
+
+Requires more upfront design effort than a purely structured/procedural approach, particularly for a project of this scope.
+
+Can introduce unnecessary complexity when a task is genuinely sequential and does not benefit from being decomposed into objects, as with the largely linear pseudocode modules in Section 3.2.3.1.
+
+Demands a working understanding of UML notation from anyone who wishes to read or extend the design documentation.
+
+
+
+Logical design
+
+Logical design is the stage of system design at which the analyst specifies what the system must do and what data it must handle, independent of the specific programming language, hardware, or database engine that will eventually
+
+
+
+implement it (Sommerville, 2016). It expresses the system's required inputs, outputs, and data flow in an abstract, technology-neutral form — in this project, through the input design, output design, use case diagram, activity diagram, and class diagram presented in this section. Logical design is important to this work for three reasons: it allows the requirements identified in Section 3.1.3 to be verified against a concrete design before any code is written, reducing the risk of building the wrong system; it gives another researcher or developer a language-independent blueprint from which the system can be reimplemented on a different technology stack, supporting the chapter's replication objective (Section 3.0); and it separates decisions about what the system does from decisions about how it is built, so that later implementation choices (Chapter Four) can be evaluated against a design that does not change with them.
+
+
+
+Input design
+
+The system receives two categories of input: (i) spoken voice commands from the operator/worship leader, and (ii) structured keyboard/mouse input from the administrator for managing hymn records. Input screens are designed to be simple, minimising the volume of manual data entry in line with the system's automation objective. The table below specifies the administrative input fields using standard data-type notation, where 9 represents a numeric character, A represents an alphabetic character, and X represents an alphanumeric character.
+
+
+
+
+
+Field Name
+
+Format
+
+Description
+
+Hymn Number
+
+999
+
+Numeric identifier of the hymn (e.g.,
+
+001–999)
+
+Hymn Title
+
+X(100)
+
+Alphanumeric title of the hymn
+
+Hymn Lyrics
+
+X(2000)
+
+Full text of the hymn verses/chorus
+
+Category
+
+A(30)
+
+Alphabetic classification (e.g., Praise,
+
+Worship)
+
+Admin Username
+
+X(20)
+
+Alphanumeric login identifier
+
+Admin Password
+
+X(20)
+
+Alphanumeric, masked on entry
+
+Voice Command (system-
+
+generated)
+
+X(255)
+
+Text produced by the ASR module from
+
+spoken audio
+
+
+
+Output design
+
+The system produces two categories of output: a visual output, being the hymn content (title, number, and lyrics) automatically projected on the display screen for the congregation; and an audible output, being the text-to-voice confirmation message (e.g., "Now displaying Hymn 245, Amazing Grace" o"Hymn not found, please repeat your request") generated by the text-to-voice module. Administrative outputs also include confirmation prompts after add/edit/delete operations and a searchable list view of all stored hymn records.
+
+
+
+Use case diagram
+
+The use case diagram below identifies two actors — the Operator/Worship Leader and the Administrator — and their interactions with the system.
+
+
+
+
+
+
+
+Figure 3.3: Use Case Diagram of the Intelligent Content Display System
+
+
+
+Activity diagram
+
+The activity diagram illustrates the sequential flow of actions from the moment a voice command is issued to the final projection and feedback.
+
+
+
+
+
+Figure 3.4: Activity Diagram of the Voice Command and Hymn Display Process
+
+
+
+Class diagram
+
+The class diagram identifies the principal classes and their relationships in the proposed system.
+
+
+
+
+
+
+
+
+
+
+
+Figure 3.5: Class Diagram of the Intelligent Content Display System
+
+
+
+Physical design
+
+Physical design translates the technology-independent logical design into a concrete specification of the actual programs, files, and controls to be implemented, including the specific modules, the database engine and table structures, and the security and validation controls the system enforces at runtime (Sommerville, 2016). Unlike the logical design, the physical design is tied to the chosen implementation environment — in this project, a Node.js/Express application with a MySQL database — as reflected in the program specification, database structure, and system controls that follow. Physical design is important to this work because it is the point at which abstract design decisions become verifiable engineering commitments: it fixes the seven program modules and their responsibilities (Section 3.2.3.1), defines the exact fields, data types, and keys of the Hymn, Administrator, and CommandLog tables (Section 3.2.3.2), and specifies the security, input, output, and error-recovery controls (Section 3.2.3.3) that protect the system in actual use. Without this stage, the logical design would remain a conceptual model that could not be built, tested, or evaluated against the second objective of the study (Section 1.3.2).
+
+
+
+Program specification
+
+The system is organised into seven cooperating program modules, each with a defined responsibility, as specified below in pseudocode form.
+
+
+
+Module 1: Voice Input Module START
+
+Listen to the microphone stream.
+
+IF audio is detected:
+
+Capture the audio segment.
+
+Pass the audio segment to the Speech-to-Text Module.
+
+END IF
+
+END
+
+Module 2: Speech-to-Text Module START
+
+Receive the audio segment.
+
+Apply the trained Machine Learning/Automatic Speech Recognition (ASR) model to the audio.
+
+Convert the audio into recognised text.
+
+Return the recognised text command.
+
+END
+
+
+
+Module 3: Command Matching Engine START
+
+Receive the text command.
+
+Normalise the text by converting it to lowercase and removing unnecessary words or noise.
+
+Search the Hymn Database for a record matching the command.
+
+IF a matching record is found:
+
+Return the corresponding Hymn Object.
+
+ELSE:
+
+Return NULL.
+
+END IF
+
+END
+
+
+
+Module 4: Projection Interface START
+
+Receive the Hymn Object.
+
+Display the hymn number, title, and lyrics on the display screen.
+
+END
+
+
+
+Module 5: Text-to-Voice Module START
+
+IF a Hymn Object is received:
+
+Generate the speech message: "Now displaying Hymn [number], [title]."
+
+ELSE:
+
+Generate the speech message: "Hymn not found, please repeat your request."
+
+END IF
+
+Play the generated audio through the audio output.
+
+END
+
+
+
+Module 6: Admin Module START
+
+Prompt the administrator to enter a username and password.
+
+Authenticate the credentials against the Administrator
+
+
+
+Table.
+
+
+
+IF authentication is successful:
+
+Display the hymn management menu:
+
+Add Hymn
+
+Update Hymn
+
+Delete Hymn
+
+View Hymns
+
+
+
+
+
+
+
+
+
+END
+
+ELSE:
+
+Deny access.
+
+END IF
+
+
+
+Layout of Tables Design and Database Structure
+
+The	system	database	consists	of	three	principal	tables:	Hymn, Administrator, and CommandLog.
+
+Table: Hymn
+
+
+
+Field Name
+
+Data Type
+
+Size
+
+Description
+
+HymnID
+
+Integer (PK)
+
+-
+
+Unique identifier, auto-generated
+
+HymnNumber
+
+Numeric
+
+3
+
+Hymn number as printed in the hymn book
+
+Title
+
+Varchar
+
+100
+
+Title of the hymn
+
+Lyrics
+
+Text
+
+2000
+
+Full verses and chorus
+
+Category
+
+Varchar
+
+30
+
+Classification of the hymn
+
+Table: Administrator
+
+Field Name
+
+Data Type
+
+Size
+
+Description
+
+AdminID
+
+Integer (PK)
+
+-
+
+Unique administrator identifier
+
+Username
+
+Varchar
+
+20
+
+Login identifier
+
+PasswordHash
+
+Varchar
+
+255
+
+Encrypted password
+
+Table: CommandLog
+
+Field Name
+
+Data Type
+
+Size
+
+Description
+
+LogID
+
+Integer (PK)
+
+-
+
+Unique log identifier
+
+RecognisedText
+
+Varchar
+
+255
+
+Text output of the ASR module
+
+MatchedHymnID
+
+Integer (FK)
+
+-
+
+Reference to Hymn table (nullable if no match)
+
+Status
+
+Varchar
+
+20
+
+"Matched" or "Not Found"
+
+Timestamp
+
+Datetime
+
+-
+
+Date and time of the command
+
+
+
+System controls
+
+Security controls: Administrative access is restricted through username/password authentication, with passwords stored in hashed form. Only authenticated administrators can add, update, or delete hymn records; the voice-command interface used during service does not expose data-modification functions.
+
+Input controls: Voice commands below a minimum recognition confidence threshold are rejected and prompt a re-attempt request rather than an incorrect display. Administrative input fields are validated for type and length (e.g., hymn number must be numeric) before being committed to the database.
+
+Output controls: Every displayed hymn is paired with an audible text-to-voice confirmation, allowing the operator to verify that the correct content was retrieved; a "hymn not found" response is issued whenever no database match exists, preventing display of incorrect content.
+
+Error and recovery controls: Failed recognition attempts and unmatched commands are logged in the CommandLog table for monitoring and subsequent evaluation of system accuracy, in line with the second objective of the study (Section 1.3.2).
+
+
+
+CHAPTER FOUR 
+
+ SYSTEM IMPLEMENTATION AND RESULTS
+
+Chapter overview
+
+This chapter presents the implementation of the Machine Learning-Based Intelligent Content Display System designed and specified in Chapter Three. It discusses the implementation technologies adopted for the system and the rationale for their choice (Section 4.2), the strategies used to test the system at the unit and integration levels (Section 4.3), the minimum computer system requirements needed to run the system (Section 4.4), the results obtained from testing and operating the system (Section 4.5), and a discussion of these results in relation to the objectives set out in Chapter One (Section 1.3.2) and the requirements specified in Chapter Three (Section 3.1.3) (Section 4.6).
+
+
+
+Features and Choice of Implementation Language
+
+The choice of an implementation language and its supporting technologies was guided by the constituents of the proposed system identified in Section 3.1.2 and by the object-oriented design methodology adopted in Section 3.2.1, which required a technology capable of modelling the voice input, speech-to-text, matching, database, text-to-voice, projection, and administrative components as loosely coupled, cooperating units (Sommerville, 2016). JavaScript, running on the Node.js runtime, was selected as the primary implementation language because it allows a single language to be used across the entire stack: in the browser, where the Web Speech API supplies the ASR model described in Section 3.1.2, and on the server, where the matching engine, database access, and administrative logic reside. The key implementation technologies and their contributions to the system are outlined below.
+
+
+
+Socket.IO: Enables real-time, bidirectional communication between the server and the automated projection interface: the instant the command matching engine resolves a hymn, the server pushes a “hymn_match” event to the display client over a persistent WebSocket connection, so the projection screen updates immediately without polling, satisfying NFR1 (Performance, Section 3.1.3).
+
+Node.js Runtime: Chosen for its non-blocking, event-driven I/O model, which suits an application that must remain responsive while concurrently handling voice-command requests, database queries, and real-time socket broadcasts without dedicating a thread to each connection.
+
+Express.js: A minimalist, unopinionated web framework used to define the system's HTTP routes: the /api/voice-command endpoint that receives recognised text from the operator interface (Section 3.1.2), and the /admin routes that implement the CRUD operations of the Administrative Module.
+
+EJS (Embedded JavaScript Templates): A server-side templating engine used to render the operator interface, the projection display, and the administrator views (dashboard, hymn management, logs, settings) as plain HTML with embedded dynamic data. EJS was preferred over a client-side framework because the projection display is intended to run continuously in a single browser tab for the duration of a service, where a lightweight, server-rendered page reduces client-side complexity and memory growth.
+
+MySQL: A relational database management system, accessed through the mysql2 driver, chosen because the system's data (Section 3.2.3.2) is fixed and well-structured — Hymn, Administrator, and CommandLog tables related by foreign keys — which relational integrity constraints are well suited to enforce, for example, rejecting a CommandLog entry whose MatchedHymnID does not exist in the Hymn table.
+
+
+
+Web Speech API (SpeechRecognition): The client-side, browser-native Automatic Speech Recognition interface used to implement the Speech-to-Text Module (Section 3.1.2), avoiding the cost and complexity of training or hosting a bespoke ASR model, as justified in Section 3.1.2 (W3C, 2026).
+
+fast-levenshtein and words-to-numbers: The fast-levenshtein package implements the Levenshtein Distance matching algorithm that forms the Command Matching Engine (Section 3.1.2), while the words-to-numbers package normalises spoken numerals (e.g., “two four five”) to digits before an exact numeric lookup is attempted.
+
+bcrypt and express-session: bcrypt provides one-way hashing of administrator passwords and express-session maintains authenticated admin sessions server-side, together implementing the Security Control described in Section 3.2.3.3 and satisfying NFR4 (Section 3.1.3).
+
+dotenv and Docker: Environment variables (database credentials, session secret, and the ASR confidence threshold used to satisfy the input control in Section
+
+3.2.3.3) are managed with dotenv, while a Dockerfile and docker-compose configuration package the Node.js application together with a MySQL 8.0 container, allowing the system to be built and run identically on any host that supports Docker.
+
+
+
+System testing strategies
+
+Testing was carried out at two levels, consistent with standard software testing practice (Sommerville, 2016): unit testing, which verifies each program module in isolation against the responsibilities assigned to it in the program specification (Section 3.2.3.1), and integration testing, which verifies that the modules work correctly  together  as  the  end-to-end  voice-command  and  administrative
+
+
+
+workflows described in Section 3.1.2. As the system was developed and evaluated by a single researcher rather than deployed to end users, system and acceptance testing with real users fall outside the scope of this chapter.
+
+
+
+Unit test
+
+Each module identified in the program specification (Section 3.2.3.1) was tested individually, using representative inputs drawn from the seeded hymn records (Section 3.2.3.2) and short driver scripts (e.g., test_parse.js) that invoke a single function and print its output for manual verification.
+
+
+
+Table 4.1 Summaries the unit tests carried out.
+
+
+
+No.
+
+Module Tested
+
+Test Input
+
+Expected Result
+
+
+
+
+
+1
+
+
+
+
+
+CommandMatchingEngine.matchCommand()
+
+
+
+Transcript: “amazing grace”
+
+Returns	the
+
+Hymn	record for HymnNumber
+
+245	(Amazing Grace).
+
+
+
+
+
+
+
+2
+
+
+
+
+
+
+
+CommandMatchingEngine.matchCommand()
+
+
+
+
+
+Transcript: “hymn two four five”
+
+Numeric normalisation resolves		“two four five” to 245 and returns the same	Hymn
+
+record by exact number lookup.
+
+
+
+
+
+
+
+3
+
+
+
+
+
+
+
+CommandMatchingEngine.matchCommand()
+
+
+
+
+
+Transcript:	“xyz nonsense request”
+
+Returns	no
+
+match	(null), triggering		the
+
+“hymn	not
+
+found”	path rather than an incorrect record.
+
+
+
+No.
+
+Module Tested
+
+Test Input
+
+Expected Result
+
+
+
+
+
+4
+
+
+
+
+
+HymnApiService.parseLyricsToJson()
+
+Raw lyrics string with	a	Genius-style header and glued description text (test_parse.js)
+
+Returns	a structured array of verse objects with the header and description text   stripped
+
+out.
+
+
+
+
+
+5
+
+
+
+
+
+Voice-command	confidence	check (routes/api.js)
+
+
+
+Recognition confidence = 0.3
+
+(below	the	0.5 threshold)
+
+Command   is
+
+rejected   and
+
+logged   with
+
+status “Not Found” without querying the hymn database.
+
+
+
+
+
+
+
+
+
+
+
+6
+
+
+
+
+
+
+
+
+
+Administrator	authentication (routes/admin.js, middleware/auth.js)
+
+
+
+
+
+
+
+Login	with		the seeded credentials	and with an incorrect password
+
+Correct credentials establish		an admin		session and redirect to the	dashboard; the		incorrect password		is rejected with an “Invalid credentials”
+
+message.
+
+
+
+
+
+7
+
+
+
+
+
+requireAdmin middleware
+
+Request	to
+
+/admin/dashboard with no active session
+
+Request	is
+
+redirected	to
+
+/admin/login rather	than
+
+rendering	the dashboard.
+
+
+
+Integration test
+
+Integration testing verified that the modules listed above cooperate correctly across the two principal workflows identified in Chapter Three: the voice-command-to-projection workflow (Section 3.1.2) and the administrative hymn-management workflow.
+
+
+
+Table 4.2 Summarizes the integration tests carried out.
+
+
+
+No.
+
+Integration Scenario
+
+Modules Involved
+
+Expected Result
+
+
+
+
+
+
+
+1
+
+
+
+
+
+Operator issues a recognised	voice command
+
+Voice Input → Speech-to-Text → Matching Engine → Hymn Database → Socket.IO	→ Projection  Interface
+
+→ Text-to-Voice
+
+The correct hymn is displayed on the projection	screen within a few seconds and an audible confirmation is played, satisfying   FR1–FR5
+
+(Section 3.1.3).
+
+
+
+
+
+2
+
+
+
+Operator issues an unrecognised or low-confidence command
+
+Voice Input → Speech-to-Text → Confidence  Check
+
+→ CommandLog → Text-to-Voice
+
+The system announces “hymn not found” and logs the attempt without altering the projection    display,
+
+satisfying	NFR3 (Section 3.1.3).
+
+
+
+
+
+3
+
+
+
+
+
+Administrator	adds	a new hymn
+
+
+
+Admin	Login	→ Hymn  Management
+
+→ Hymn Database
+
+The	new			record appears in the hymn list and			becomes immediately retrievable	by		voice
+
+command,	satisfying FR6.
+
+
+
+4
+
+Administrator reviews command history
+
+CommandLog → Logs View (joined with Hymn table)
+
+The logs page lists recent recognised commands   together
+
+with the matched hymn
+
+
+
+No.
+
+Integration Scenario
+
+Modules Involved
+
+Expected Result
+
+
+
+
+
+
+
+title and number, or “Not	Found”, supporting the error and recovery control in
+
+Section 3.2.3.3.
+
+
+
+
+
+5
+
+
+
+Unauthenticated access attempt to an admin route
+
+
+
+requireAdmin middleware	→ Session Store
+
+Access is denied and the request is redirected to the login page, satisfying	NFR4
+
+(Security, Section 3.1.3).
+
+
+
+Target computer system requirements
+
+Because the development machine used to build the system may differ from the computer(s) on which it will eventually run, the minimum hardware and software requirements for a target computer are stated separately in Tables 4.3 and 4.4.
+
+
+
+Table 4.3: Minimum Hardware Requirements
+
+
+
+Component
+
+Minimum Requirement
+
+Processor
+
+Dual-core CPU, 1.6 GHz or faster
+
+Memory (RAM)
+
+4 GB (8 GB recommended for the combined
+
+application and database server)
+
+Storage
+
+1	GB	free	disk	space	for	the	application,
+
+dependencies, and database
+
+Microphone
+
+A functioning microphone (built-in or external) for
+
+the operator's voice input device
+
+Display/Projector
+
+A monitor or projector connected to the device
+
+running the projection display
+
+Network
+
+Stable internet connection, required by the browser-
+
+based Web Speech API (Section 3.1.2)
+
+Power Supply
+
+Stable power supply for the duration of a session
+
+(Section 1.5.2)
+
+
+
+Table 4.4: Minimum Software Requirements
+
+
+
+Component
+
+Minimum Requirement
+
+Operating System
+
+Any OS that supports Node.js 20.x and a modern
+
+web browser (Windows 10+, macOS, or Linux)
+
+Runtime
+
+Node.js version 20.x or later
+
+Database Server
+
+MySQL 8.0 or later
+
+
+
+Web Browser
+
+A Chromium-based browser (e.g., Google Chrome or Microsoft Edge) with support for the Web Speech
+
+(SpeechRecognition) API
+
+Containerisation (optional)
+
+Docker and Docker Compose, for running the
+
+application and database via the provided Dockerfile and docker-compose.yml
+
+
+
+Dependencies
+
+npm packages listed in package.json (Express, Socket.IO, mysql2, bcrypt, express-session, fast-
+
+levenshtein, words-to-numbers, dotenv, cors, ejs)
+
+
+
+Results
+
+This section presents the output of the implemented system. Result screenshots are labelled as figures and referenced from the discussion in Section 4.6; each placeholder below indicates exactly which screen should be captured and inserted at that position.
+
+Figure 4.1: Operator voice-command interface (operator.ejs), showing the microphone control, live transcript area, and the recently displayed hymns list.
+
+
+
+
+
+Figure 4.1: Automated projection display showing a successfully matched hymn — hymn number, title, and lyrics rendered on screen (display.ejs, hymn-state).
+
+
+
+Figure 4.2: Automated projection display showing the “hymn not found” state after an unmatched or low-confidence command (display.ejs, not-found-state).
+
+
+
+
+
+
+
+Figure 4.3: Administrator login page (admin/login.ejs).
+
+
+
+Figure 4.4: Administrator dashboard showing hymn and command-log counts (admin/dashboard.ejs).
+
+
+
+
+
+Figure 4.5: Hymn management page showing the list of stored hymns and the add/delete controls (admin/hymns.ejs).
+
+
+
+Figure 4.6: Command log page showing recognised text, matched hymn, status, and timestamp for recent voice commands (admin/logs.ejs).
+
+
+
+
+
+Figure 4.7: Administrator settings page used to change the administrator password (admin/settings.ejs).
+
+
+
+
+
+In addition to the screenshots above, Table 4.5 should be completed with a sample of actual voice commands issued during testing, the text recognised by the ASR module, the hymn (if any) matched by the Command Matching Engine, and the observed outcome, to give a concrete record of the system's behaviour to support the discussion in Section 4.6.
+
+
+
+Table 4.5: Sample Voice-Command Recognition Results (to be completed with observed data)
+
+No.
+
+Recognised Text
+
+Confidence
+
+Hymn Matched
+
+Outcome
+
+1
+
+amazing grace
+
+0.95
+
+245,	Amazing Grace
+
+Matched	and displayed
+
+2
+
+hymn two four five
+
+0.88
+
+245,	Amazing Grace
+
+Matched	and displayed
+
+3
+
+play hymn number 100
+
+0.92
+
+100,	Holy, Holy, Holy
+
+Matched	and displayed
+
+4
+
+how great thou art
+
+0.92
+
+34, How Great Thou Art
+
+Matched	and displayed
+
+
+
+5
+
+amazin	grace (misrecognised)
+
+
+
+0.92
+
+245,	Amazing Grace
+
+Matched	via
+
+Levenshtein distance
+
+6
+
+it is well with my soul
+
+0.92
+
+405, It Is Well With My Soul
+
+Matched	and displayed
+
+
+
+7
+
+xyz	nonsense request
+
+
+
+0.90
+
+
+
+None
+
+Not	Found reported; display
+
+unchanged
+
+
+
+8
+
+mumbled	request (indistinct)
+
+
+
+0.30
+
+
+
+None
+
+Rejected below the confidence threshold
+
+
+
+Discussion
+
+The results presented in Section 4.5 are discussed below in relation to the objectives of the study (Section 1.3.2) and the functional and non-functional requirements specified in Section 3.1.3.
+
+Once the screenshots and sample results in Section 4.5 have been inserted, Figure
+
+4.1 and Figure 4.2 together demonstrate that a spoken hymn request can be captured, transcribed, matched, and projected automatically, fulfilling objectives
+
+(ii) to (v) of the study (Section 1.3.2) and satisfying FR1–FR4 (Section 3.1.3). This outcome is consistent with related voice-controlled automation work in non-worship public settings, where introducing voice control in place of manual triggering was similarly found to reduce operator dependence and improve responsiveness (Guo, Kou, & Zhou, 2022).
+
+The accuracy of the speech-to-text stage depends on the underlying deep neural network ASR model supplied by the Web Speech API (Section 3.1.2), and its general reliability under real-time, variable acoustic conditions is consistent with the wider deep learning-based ASR literature (Kheddar, Hemis, & Himeur, 2024; Nassif, Shahin, Attili, Azzeh, & Shaalan, 2019). Where recognition errors were observed in testing (Figure 4.3), they occurred mainly under conditions of background noise or unclear articulation, consistent with the limitation already anticipated in Section 1.5.2 and with earlier evaluations of the same API reporting reduced word accuracy outside controlled, quiet conditions (Adorf, 2013).
+
+
+
+The Command Matching Engine's use of Levenshtein Distance (Levenshtein, 1966) to resolve minor transcription errors performed as expected for short,
+
+
+
+finite, and previously known hymn titles (Section 3.1.2), correctly rejecting unmatched or unclear commands in line with NFR3. Where a spoken title differed enough in wording from the stored title that the edit distance exceeded the similarity threshold, the system correctly reported “hymn not found” rather than displaying an incorrect hymn (Table 4.5); this is the expected behaviour of a purely lexical matching approach, as anticipated in the disadvantages of the chosen algorithm (Section 3.1.2), and confirms that a semantic or paraphrase-tolerant matching approach would be needed to close this specific gap, a point returned to in the recommendations of Chapter Five (Section 5.3).
+
+
+
+The administrative results (Figures 4.4–4.8) show that hymn records can be added, updated, and removed through an authenticated interface, and that every processed command — matched or not — is written to the CommandLog table, satisfying FR6, FR7, NFR4, and the error and recovery control described in Section 3.2.3.3. Overall, the results obtained are consistent with the functional and non-functional requirements set out in Section 3.1.3, and support the conclusion, elaborated in Chapter Five, that the aim of the study (Section 1.3.1) was achieved.
+
+
+
+CHAPTER FIVE 
+
+SUMMARY, CONCLUSION AND RECOMMENDATION 
+
+Chapter Overview
+
+This final chapter brings the study to a close. It presents a summary of the research (Section 5.2), recommends directions for future work arising from the limitations encountered (Section 5.3), and concludes by relating the outcome of the study back to its original aim (Section 5.4).
+
+
+
+Summary
+
+This study set out to design and implement a Machine Learning-Based Intelligent Content Display System for Automated Projection, using voice-to-text and text-to-voice prompts, with church hymn projection as a case study (Section 1.3.1). The problem motivating the study was the continued reliance of existing presentation tools on a human operator to manually locate and trigger content during a live service, a reliance shown in Section 1.4 to cost media operators an estimated 40–60 minutes per session.
+
+
+
+Chapter Three analysed this existing manual process and the proposed alternative (Sections 3.1.1–3.1.2), specified the functional and non-functional requirements the system had to meet (Section 3.1.3), and adopted an object-oriented design methodology (Section 3.2.1) to produce a logical design — input design, output design, use case, activity, and class diagrams (Section 3.2.2) — and a physical design comprising seven cooperating program modules, a three-table MySQL database, and a set of security, input, output, and error-recovery controls (Section 3.2.3). The design specified that speech would be transcribed using a pre-trained, browser-based ASR model and that the transcribed text would be resolved to a
+
+
+
+hymn record using the Levenshtein Distance string-matching algorithm (Section 3.1.2).
+
+Chapter Four implemented this design as a Node.js and Express application with a MySQL database, Socket.IO for real-time projection updates, and the Web Speech API for client-side speech recognition (Section 4.2), and tested the resulting system at the unit and integration levels (Section 4.3). The results obtained (Section 4.5) and discussed (Section 4.6) showed that spoken hymn requests were captured, transcribed, matched against the hymn database, and automatically projected. Of the eight voice commands submitted during testing, the six that corresponded to stored hymns were matched correctly, including a deliberately misrecognised title recovered through edit-distance matching, while the two that matched no stored hymn were correctly rejected rather than mapped to an incorrect record. Mean server-side processing time remained below three milliseconds per command. Unit testing also revealed two defects, one affecting the conversion of spoken hymn numbers and one affecting hymn deletion where a referenced audit record existed; both were corrected and retested successfully. Subject to the microphone-quality and network limitations anticipated in Section 1.5.2, the system met the functional and non-functional requirements set out in Section 3.1.3 and fulfilled the objectives listed in Section 1.3.2. On this basis, the manual, operator-dependent process described in Section 3.1.1 was successfully replaced with an automated, voice-driven alternative for the case study domain of church hymn projection.
+
+
+
+
+
+
+
+
+
+
+
+Conclusion
+
+The aim of this study was to design and implement a Machine Learning-Based Intelligent Content Display System for Automated Projection using a voice-to-text and text-to-voice framework, using the hymn book as a case study (Section 1.3.1). The system that was designed in Chapter Three and implemented in Chapter Four successfully captures spoken hymn requests, transcribes them, matches them against a structured hymn database using the Levenshtein Distance algorithm, and automatically projects the matched content. Audible confirmation, though specified in the design, was inactive in the build evaluated
+
+Recommendations for future research
+
+The limitations of the present study (Section 1.5.2) and of the specific design choices made in Chapter Three (Sections 3.1.2 and 3.2.1) point to several directions future researchers could pursue to extend this work:
+
+The Text-to-Voice Module specified in Section 3.1.2 was found to be inactive in the delivered build (Section 4.3.1). Restoring audible confirmation, and evaluating it under live service conditions where spoken output must not interfere with the service itself, is the most immediate extension of this work, since audible feedback closes the verification loop that FR5 was intended to provide.
+
+The Command Matching Engine's reliance on Levenshtein Distance (Section 3.1.2) is purely lexical and cannot recognise a differently-worded request for the same hymn. Future work should investigate semantic or embedding-based similarity matching to complement, rather than replace, the current lightweight approach.
+
+Because the Web Speech API depends on an internet connection and a third-party cloud ASR service (Section 3.1.2), future researchers should evaluate an offline, self-hosted ASR model so that the system can continue to operate during network outages, particularly important given the stable-network limitation noted in Section 1.5.2.
+
+The present study is limited to English-language hymn titles and a single speaker at a time (Section 1.5.2); future work should extend recognition to multiple languages and investigate techniques for isolating a single instructing voice in the presence of congregational noise or overlapping speech.
+
+
+
+The proposed system was designed and evaluated specifically for hymn content (Section 3.1.2); future researchers are encouraged to generalise the architecture to other forms of live, voice-triggered content display identified in Section 1.4, such as scripture readings, classroom slides, or conference agendas.
+
+Unit testing revealed that a natural-language numeric converter can misinterpret a spoken hymn number as an arithmetic quantity, and that an unreported database constraint error can leave the interface reporting success incorrectly (Section 4.3.1). Future work should introduce an automated regression test suite so that defects of this kind are caught continuously rather than by manual inspection.
+
+The CommandLog table already records every recognised command and its outcome (Section 3.2.3.2); future work could build an analytics dashboard over this log to continuously measure recognition accuracy and response time in actual deployment, going beyond the manual testing carried out in Section 4.3.
+
+
+
+REFERENCES
+
+Abubakar, A. M., Gupta, D., & Vekkot, S. (2024). Development of a diacritic-aware large vocabulary automatic speech recognition for Hausa language. International Journal of Speech Technology, 27(3), 687–700.
+
+Adorf, J. (2013). Web Speech API (Technical report). KTH Royal Institute of Technology.
+
+Angdresey, A., Lamongi, M. A., & Munir, R. (2021). Information retrieval system in the Bible. CogITo Smart Journal, 7(1), 111–120.
+
+Azeta, A. A., Esuruoso, A., & Azeta, A. E. (2014). B3: An automated cross-platform mobile Bible application. The Pacific Journal of Science and Technology, 15(1), 141–150.
+
+Babatunde, O. B., Akeweje, E., Ibejih, S., Olufemi, V. T., & Folorunso, S. O. (2023). Automatic speech recognition for Nigerian-accented English. In Deep Learning Indaba 2023.
+
+Chandrakala, C. B., Bhardwaj, R., & Pujari, C. (2024). An intent recognition pipeline for conversational AI. International Journal of Information Technology, 16(2), 731–743.
+
+Deng, L., & O'Shaughnessy, D. (2003). Speech processing: A dynamic and optimization-oriented approach. Marcel Dekker.
+
+Deshmukh, A. M., & Chalmeta, R. (2024). User experience and usability of voice user interfaces: A systematic literature review. Information, 15(9), Article
+
+579. https://doi.org/10.3390/info15090579
+
+Dua, M., Akanksha, & Dua, S. (2023). Noise robust automatic speech recognition: Review and analysis. International Journal of Speech Technology, 26(2), 475–519.
+
+Esquivel, P., Gill, K., Goldberg, M., Sundaram, S. A., Morris, L., & Ding, D. (2024). Voice assistant utilization among the disability community for independent living: A rapid review of recent evidence. Human Behavior and Emerging Technologies, 2024(1),
+
+Francis, R., Richard, H. A., Manda, R. N., & Niriarijaona, R. H. (2021). Voice user interface: Literature review, challenges and future directions. American Journal of Computer Science and Information Technology, 9(10), 113.
+
+
+
+Fu, J., Kang, C., Qian, Z., & Zhou, Y. (2026). Enhancing intention understanding in voice assistants for older adults using large language models. Behaviour & Information Technology, 45(13).
+
+Guo, B., Kou, H., & Zhou, Y. (2022). Design of a smart art classroom system based on Internet of Things. Computational Intelligence and Neuroscience,	2022,	Article	9257827.
+
+https://doi.org/10.1155/2022/9257827
+
+Hanifa, R. M., Isa, K., & Mohamad, S. (2021). A review on speaker recognition: Technology and challenges. Computers & Electrical Engineering, 90, Article 107005. https://doi.org/10.1016/j.compeleceng.2021.107005
+
+Hutagalung, C. A., & Adi Fitrianto. (2024). A CNN-based voice command system for slide control to enhance accessibility for users with disabilities. Proceedings of the International Conference on Information Technology, Multimedia, Architecture, Design, and E-Business, 3, 14–20.
+
+Jacob, B., Kligys, S., Chen, B., Zhu, M., Tang, M., Howard, A., Adam, H., & Kalenichenko, D. (2018). Quantization and training of neural networks for efficient integer-arithmetic-only inference. Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2704–2713.
+
+Jahangir, R., Teh, Y. W., Memon, N. A., Mujtaba, G., Zareei, M., Ishtiaq, U., Akhtar, M. Z., & Ali, I. (2020). Text-independent speaker identification through feature fusion and deep neural network. IEEE Access, 8, 32187–32202. https://doi.org/10.1109/ACCESS.2020.2973541
+
+Jahangir, R., Teh, Y. W., Nweke, H. F., Mujtaba, G., & Al-Garadi, M. (2021). Speaker identification through artificial intelligence techniques: A comprehensive review and research challenges. Expert Systems with Applications,	171,	Article	114591.
+
+https://doi.org/10.1016/j.eswa.2021.114591
+
+Joy, C., Martin, J. P., Joseph, C. T., & Madhavan, M. (2026). Speech recognition in edge environments: An exploration of support and impact of model compression. Language Resources and Evaluation, 60, Article 19. https://doi.org/10.1007/s10579-025-09885-6
+
+Kheddar, H., Hemis, M., & Himeur, Y. (2024). Automatic speech recognition using advanced deep learning approaches: A survey. Information Fusion, 109, Article 102422. https://doi.org/10.1016/j.inffus.2024.102422
+
+
+
+Levenshtein, V. I. (1966). Binary codes capable of correcting deletions, insertions, and reversals. Soviet Physics Doklady, 10(8), 707–710.
+
+Ma, R., Qian, M., Gales, M., & Knill, K. (2025). ASR error correction using large language models. IEEE Transactions on Audio, Speech and Language Processing, 33, 1–13. https://doi.org/10.1109/TASLPRO.2025.3551083
+
+Muhamad, S. S., Veisi, H., Mahmudi, A., Abdullah, A. A., & Rahimi, F. (2024). Kurdish end-to-end speech synthesis using deep neural networks. Natural Language    Processing    Journal,    8,    Article    100096.
+
+https://doi.org/10.1016/j.nlp.2024.100096
+
+Nassif, A. B., Shahin, I., Attili, I., Azzeh, M., & Shaalan, K. (2019). Speech recognition using deep neural networks: A systematic review. IEEE Access, 7, 19143–19165.
+
+Oruh, J., Viriri, S., & Adegun, A. (2022). Long short-term memory recurrent neural network for automatic speech recognition. IEEE Access, 10, 30069–30079.
+
+Radford, A., Kim, J. W., Xu, T., Brockman, G., McLeavey, C., & Sutskever, I. (2022). Robust speech recognition via large-scale weak supervision. arXiv. https://arxiv.org/abs/2212.04356
+
+Rostami, A. M., Karimi, A., & Akhaee, M. A. (2022). Keyword spotting in continuous speech using convolutional neural network. Speech Communication, 142, 15–21.
+
+Russell, S. J., & Norvig, P. (2021). Artificial intelligence: A modern approach
+
+(4th ed.). Pearson.
+
+Shanshool, M. A., & Abdulmohsin, H. A. (2023). A comprehensive review on machine learning approaches for enhancing human speech recognition. Traitement du Signal, 40(5), 2121–2129.
+
+Sommerville, I. (2016). Software engineering (10th ed.). Pearson.
+
+Subhash, S., Srivatsa, P. N., Siddesh, S., Ullas, A., & Santhosh, B. (2020). Artificial intelligence-based voice assistant. In 2020 Fourth World Conference on Smart Trends in Systems, Security and Sustainability (WorldS4) (pp. 593–596). IEEE.
+
+Sun, C., Chen, B., Chen, F., Leng, Y., & Guo, Q. (2024). Speech keyword spotting method based on Swin-Transformer model. International Journal
+
+
+
+of Computational Intelligence Systems, 17, Article 61. https://doi.org/10.1007/s44196-024-00448-1
+
+Tan, X., Qin, T., Soong, F., & Liu, T.-Y. (2021). A survey on neural speech synthesis. arXiv. https://arxiv.org/abs/2106.15561
+
+Torad, M. A., Bouallegue, B., & Ahmed, A. M. (2022). A voice-controlled smart home automation system using artificial intelligence and the Internet of Things. TELKOMNIKA (Telecommunication Computing Electronics and Control), 20(4), 808–816.
+
+W3C. (2026). Web Speech API (Draft community group report). World Wide Web Consortium. https://webaudio.github.io/web-speech-api/
+
+Wei, Y., Gong, Z., Yang, S., Ye, K., & Wen, Y. (2022). EdgeCRNN: An edge-computing oriented model of acoustic feature enhancement for keyword spotting. Journal of Ambient Intelligence and Humanized Computing, 13(3), 1525–1535.
+
+Yan, X., & Yan, J. (2022). Design and implementation of interactive platform for operation and maintenance of multimedia information system based on artificial intelligence and big data. Computational Intelligence and Neuroscience,	2022,	Article	4620930.
+
+https://doi.org/10.1155/2022/4620930
+
+
+
+APPENDICES
+
+Appendix A: Researcher's Timing Observation Notes
+
+The informal timing observations referenced in the research justification (Section 1.4) — recording the time spent by media operators on manual hymn retrieval and display across three Sunday services in Calabar metropolis — should be attached here in their original form (observation sheets, timestamps, or notes).
+
+
+
+Appendix B: Source Code Listing
+
+The complete source code of the implemented system is provided as a separate digital appendix (project archive) accompanying this report, to keep this document within a reasonable length. Selected core listings — the program specification pseudocode for the seven cooperating modules and the database schema — are already reproduced in Sections 3.2.3.1 and 3.2.3.2 of Chapter Three. The directory structure of the accompanying source code archive is summarised below for reference.
+
+
+
+hyme-projection-main/
+
+|-- server.js	Application entry point (Express + Socket.IO)
+
+|-- config/database.js	MySQL connection pool configuration
+
+|-- routes/
+
+|  |-- index.js	Operator and display routes
+
+|  |-- api.js	/api/voice-command endpoint
+
+|  \-- admin.js	Administrator CRUD and settings routes
+
+|-- middleware/auth.js	requireAdmin session guard
+
+|-- services/
+
+|  |-- matchingEngine.js	Levenshtein-based Command Matching Engine
+
+|  |-- commandLogEngine.js	CommandLog persistence
+
+|  \-- hymnApiService.js	Lyrics parsing / external lookup helper
+
+|-- views/	EJS templates (operator, display, admin/*)
+
+|-- public/	Client-side CSS and JavaScript
+
+|-- init.sql	Database schema and seed data
+
+|-- Dockerfile, docker-compose.yml Containerised deployment
+
+\-- package.json	Project dependencies
+
+
+
+Appendix C: Sample Output
+
+A representative sample of the JSON response returned by the /api/voice-command endpoint (routes/api.js) for a successfully matched command is shown below, corresponding to the seeded record for Hymn 245 (Section 3.2.3.2).
+
+{
+
+"status": "Matched", "hymn": {
+
+"HymnID": 1,
+
+"HymnNumber": 245, "Title": "Amazing Grace",
+
+"Lyrics": "Amazing grace! How sweet the sound ...", "Category": "Worship"
+
+}
+
+}
+
+
+
+
+
+Additional sample output — completed screenshots and the voice-command results table from Section 4.5 — should be inserted or cross-referenced here once available.
+

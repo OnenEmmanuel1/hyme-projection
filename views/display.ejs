@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="icds-display-body">
-    
+
     <!-- Audio unlock overlay (browsers require interaction before TTS) -->
     <div id="unlock-overlay" class="icds-unlock-overlay">
         <h2>Projection Display Ready</h2>
@@ -36,14 +38,17 @@
                 <h1 class="icds-hymn-title" id="hymn-title"></h1>
             </div>
             <div class="icds-hymn-lyrics" id="hymn-lyrics"></div>
-            
+
             <!-- Verse Navigation Controls -->
-            <button id="btn-prev-verse" class="icds-btn icds-btn-secondary icds-nav-btn icds-nav-left" style="display: none;">&#8592;</button>
-            <button id="btn-next-verse" class="icds-btn icds-btn-primary icds-nav-btn icds-nav-right" style="display: none;">&#8594;</button>
+            <button id="btn-prev-verse" class="icds-btn icds-btn-secondary icds-nav-btn icds-nav-left"
+                style="display: none;">&#8592;</button>
+            <button id="btn-next-verse" class="icds-btn icds-btn-primary icds-nav-btn icds-nav-right"
+                style="display: none;">&#8594;</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/display.js"></script>
 </body>
+
 </html>

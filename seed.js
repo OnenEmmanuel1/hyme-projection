@@ -23,7 +23,14 @@ async function seedDatabase() {
         console.log('Executing init.sql...');
         await connection.query(sql);
 
-        console.log('Database seeded successfully!');
+        console.log('Database basic schema seeded successfully!');
+        
+        console.log('Starting bulk import of text hymns from hyme 1 folder...');
+        const { execSync } = require('child_process');
+        execSync('node import_hymns.js', { stdio: 'inherit', cwd: __dirname });
+        
+        console.log('All database seeding and imports completed successfully!');
+        
         await connection.end();
         process.exit(0);
     } catch (error) {

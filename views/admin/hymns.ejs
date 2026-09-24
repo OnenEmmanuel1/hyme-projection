@@ -15,7 +15,6 @@
                     <tr>
                         <th class="ps-4">Number</th>
                         <th>Title</th>
-                        <th>Category</th>
                         <th class="text-end pe-4">Actions</th>
                     </tr>
                 </thead>
@@ -30,11 +29,10 @@
                     <% } %>
                     <% hymns.forEach(hymn => { %>
                         <tr>
-                            <td class="ps-4 fw-bold" style="color: var(--icds-primary);">#<%= hymn.HymnNumber %></td>
-                            <td class="fw-semibold text-white"><%= hymn.Title %></td>
-                            <td><span class="badge" style="background-color: rgba(255,255,255,0.1); color: var(--icds-text-muted);"><%= hymn.Category || 'Uncategorized' %></span></td>
+                            <td class="ps-4 fw-bold" style="color: var(--icds-primary);">#<%= hymn.hymn_number %></td>
+                            <td class="fw-semibold text-white"><%= hymn.title %></td>
                             <td class="text-end pe-4">
-                                <form action="/admin/hymns/delete/<%= hymn.HymnID %>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this hymn?');">
+                                <form action="/admin/hymns/delete/<%= hymn.id %>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this hymn?');">
                                     <button type="submit" class="btn btn-sm btn-outline-danger fw-bold d-inline-flex align-items-center gap-1">
                                         <i data-lucide="trash-2" width="14"></i> Delete
                                     </button>
@@ -65,10 +63,6 @@
                     <div class="mb-3">
                         <label for="Title" class="form-label text-muted fw-semibold">Title</label>
                         <input type="text" class="form-control" id="Title" name="Title" maxlength="100" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="Category" class="form-label text-muted fw-semibold">Category</label>
-                        <input type="text" class="form-control" id="Category" name="Category" maxlength="30">
                     </div>
                     <div class="mb-3">
                         <label for="Lyrics" class="form-label text-muted fw-semibold">Lyrics</label>

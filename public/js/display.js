@@ -25,41 +25,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     Verse ${v.verseNumber}
                 </div>
                 <div style="text-align: center;">
-                    ${v.text.trim().replace(/\n/g, '<br>')}
+                    ${v.text.split('\n').map(l => l.trim()).join('<br>')}
                 </div>
             </div>`;
     }
 
     function updateButtons() {
-        btnPrevVerse.disabled = currentVerseIndex === 0;
-        btnNextVerse.disabled = currentVerseIndex === currentVerses.length - 1;
-        
-        btnPrevVerse.style.opacity = btnPrevVerse.disabled ? '0.5' : '1';
-        btnNextVerse.style.opacity = btnNextVerse.disabled ? '0.5' : '1';
+        // Buttons are hidden on projection screen as per requirements
+        btnPrevVerse.style.display = 'none';
+        btnNextVerse.style.display = 'none';
     }
 
-    btnPrevVerse.addEventListener('click', () => {
-        if (currentVerseIndex > 0) {
-            currentVerseIndex--;
-            renderCurrentVerse();
-            updateButtons();
-        }
-    });
+    // Automatically initiate display screen without waiting for button click
+    unlockOverlay.style.display = 'none';
+    displayContainer.style.display = 'flex';
+    
+    // Attempt fullscreen, though browsers usually block this without user interaction
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(e => console.log('Fullscreen requires interaction.'));
+    }
 
-    btnNextVerse.addEventListener('click', () => {
-        if (currentVerseIndex < currentVerses.length - 1) {
-            currentVerseIndex++;
-            renderCurrentVerse();
-            updateButtons();
-        }
-    });
-
-    // Start Display (Requires click for Fullscreen API)
+    // Keep unlockBtn around just in case user needs to click for fullscreen manually
     unlockBtn.addEventListener('click', () => {
-        unlockOverlay.style.display = 'none';
-        displayContainer.style.display = 'flex';
-        
-        // Go full screen for the projection display
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen().catch(e => console.log('Fullscreen error:', e));
         }
@@ -81,33 +68,75 @@ document.addEventListener('DOMContentLoaded', () => {
             hymnTitle.textContent = hymn.Title;
             
             // Format lyrics
-            if (hymn.VersesJSON) {
-                // If it's a string (e.g. from a raw query), parse it. Otherwise use it directly.
+            if (hymn.stanzas && hymn.stanzas.length > 0) {
+                // We use hymn.stanzas from the new schema
+                currentVerses = hymn.stanzas.map(s => ({
+                    verseNumber: s.stanza_number,
+                    text: s.content,
+                    isChorus: s.is_chorus
+                }));
+                
+                // If a specific stanza was requested, jump to it
+                currentVerseIndex = 0;
+                if (hymn.targetStanza) {
+                    if (hymn.targetStanza === 'chorus') {
+                        const chorusIndex = currentVerses.findIndex(v => v.isChorus);
+                        if (chorusIndex !== -1) currentVerseIndex = chorusIndex;
+                    } else {
+                        const sIndex = currentVerses.findIndex(v => v.verseNumber === hymn.targetStanza);
+                        if (sIndex !== -1) currentVerseIndex = sIndex;
+                    }
+                }
+                
+                renderCurrentVerse();
+                
+                renderCurrentVerse();
+                updateButtons();
+            } else if (hymn.VersesJSON) {
                 currentVerses = typeof hymn.VersesJSON === 'string' ? JSON.parse(hymn.VersesJSON) : hymn.VersesJSON;
                 currentVerseIndex = 0;
                 
                 renderCurrentVerse();
-                
-                if (currentVerses.length > 1) {
-                    btnPrevVerse.style.display = 'block';
-                    btnNextVerse.style.display = 'block';
-                    updateButtons();
-                } else {
-                    btnPrevVerse.style.display = 'none';
-                    btnNextVerse.style.display = 'none';
-                }
-            } else {
+                updateButtons();
+            } else if (hymn.Lyrics) {
                 // Fallback for old lyrics column
                 btnPrevVerse.style.display = 'none';
                 btnNextVerse.style.display = 'none';
                 hymnLyrics.innerHTML = hymn.Lyrics.replace(/\n/g, '<br>');
+            } else {
+                hymnLyrics.innerHTML = "No lyrics available.";
             }
             
             hymnState.classList.add('active');
-            // Text-to-Speech has been removed per user request
+            
+            // Audible confirmation (Text-to-Speech)
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(`Displaying hymn ${hymn.hymn_number}, ${hymn.title}`);
+                // Optional: set properties
+                msg.rate = 0.9;
+                window.speechSynthesis.speak(msg);
+            }
             
         } else {
             notFoundState.classList.add('active');
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const msg = new SpeechSynthesisUtterance(`Hymn not found.`);
+                msg.rate = 0.9;
+                window.speechSynthesis.speak(msg);
+            }
+        }
+    });
+    
+    socket.on('change_verse', (data) => {
+        if (typeof data.index === 'number' && currentVerses && currentVerses.length > 0) {
+            if (data.index >= 0 && data.index < currentVerses.length) {
+                currentVerseIndex = data.index;
+                renderCurrentVerse();
+            }
         }
     });
 });

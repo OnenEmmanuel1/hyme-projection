@@ -45,7 +45,7 @@ router.use((req, res, next) => {
 });
 
 router.get('/dashboard', async (req, res) => {
-    const [hymnStats] = await pool.query('SELECT COUNT(*) as count FROM Hymn');
+    const [hymnStats] = await pool.query('SELECT COUNT(*) as count FROM hymns');
     const [logStats] = await pool.query('SELECT COUNT(*) as count FROM CommandLog');
     res.render('admin/dashboard', { 
         hymnCount: hymnStats[0].count,
@@ -55,17 +55,35 @@ router.get('/dashboard', async (req, res) => {
 
 // --- HYMNS CRUD ---
 router.get('/hymns', async (req, res) => {
-    const [hymns] = await pool.query('SELECT * FROM Hymn ORDER BY HymnNumber ASC');
+    const [hymns] = await pool.query('SELECT * FROM hymns ORDER BY hymn_number ASC');
     res.render('admin/hymns', { hymns });
 });
 
 router.post('/hymns/create', async (req, res) => {
     const { HymnNumber, Title, Lyrics, Category } = req.body;
     try {
-        await pool.query(
-            'INSERT INTO Hymn (HymnNumber, Title, Lyrics, Category) VALUES (?, ?, ?, ?)',
-            [HymnNumber, Title, Lyrics, Category]
+        const [result] = await pool.query(
+            'INSERT INTO hymns (hymn_number, title) VALUES (?, ?)',
+            [HymnNumber, Title]
         );
+        const hymnId = result.insertId;
+        
+        // Simple heuristic: split lyrics by double newline to separate stanzas
+        const stanzas = Lyrics.split(/\n\n+/).filter(s => s.trim().length > 0);
+        let stanza_number = 1;
+        for (const stanza of stanzas) {
+            let is_chorus = false;
+            let content = stanza;
+            if (stanza.toLowerCase().startsWith('chorus:')) {
+                is_chorus = true;
+                content = stanza.substring(7).trim();
+            }
+            await pool.query(
+                'INSERT INTO hymn_stanzas (hymn_id, stanza_number, is_chorus, content) VALUES (?, ?, ?, ?)',
+                [hymnId, stanza_number, is_chorus, content]
+            );
+            stanza_number++;
+        }
     } catch (err) {
         console.error(err);
     }
@@ -74,7 +92,7 @@ router.post('/hymns/create', async (req, res) => {
 
 router.post('/hymns/delete/:id', async (req, res) => {
     try {
-        await pool.query('DELETE FROM Hymn WHERE HymnID = ?', [req.params.id]);
+        await pool.query('DELETE FROM hymns WHERE id = ?', [req.params.id]);
     } catch (err) {
         console.error(err);
     }
@@ -84,9 +102,9 @@ router.post('/hymns/delete/:id', async (req, res) => {
 // --- LOGS ---
 router.get('/logs', async (req, res) => {
     const [logs] = await pool.query(`
-        SELECT l.*, h.Title, h.HymnNumber 
+        SELECT l.*, h.title as Title, h.hymn_number as HymnNumber 
         FROM CommandLog l 
-        LEFT JOIN Hymn h ON l.MatchedHymnID = h.HymnID 
+        LEFT JOIN hymns h ON l.MatchedHymnID = h.id 
         ORDER BY l.Timestamp DESC 
         LIMIT 100
     `);

@@ -10,9 +10,9 @@ router.get('/operator', async (req, res) => {
     let recentLogs = [];
     try {
         const [logs] = await pool.query(`
-            SELECT h.HymnNumber, h.Title, l.RecognisedText 
+            SELECT h.hymn_number as HymnNumber, h.title as Title, l.RecognisedText 
             FROM CommandLog l 
-            JOIN Hymn h ON l.MatchedHymnID = h.HymnID 
+            JOIN hymns h ON l.MatchedHymnID = h.id 
             WHERE l.Status = 'Matched' 
             ORDER BY l.Timestamp DESC 
             LIMIT 4

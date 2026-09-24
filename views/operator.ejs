@@ -18,7 +18,25 @@
 </div>
 
 <!-- Feedback hidden by default, shown via JS if error/success -->
-<div id="feedback-display" class="icds-feedback text-center mb-5" style="display: none;"></div>
+<div id="feedback-display" class="icds-feedback text-center mb-4" style="display: none;"></div>
+
+<!-- Inline Hymn Display (User requested same tab display) -->
+<div id="inline-hymn-display" style="display: none; background-color: var(--icds-card-bg); border: 1px solid var(--icds-border); border-radius: 16px; padding: 30px; margin-bottom: 40px; text-align: center;">
+    <h2 id="inline-hymn-title" style="font-size: clamp(1.5rem, 3vw, 3rem); font-weight: 900; margin-bottom: 20px; color: var(--icds-text);"></h2>
+    <div id="inline-hymn-lyrics" style="font-size: clamp(1.2rem, 2.5vw, 2.5rem); font-weight: 600; line-height: 1.5; color: var(--icds-text); white-space: normal;"></div>
+    
+    <div style="margin-top: 30px; display: flex; justify-content: center; gap: 20px;">
+        <button id="inline-btn-prev" class="btn btn-outline-secondary px-4 fw-bold" style="display: none;">&larr; Previous Verse</button>
+        <button id="inline-btn-next" class="btn btn-outline-primary px-4 fw-bold" style="display: none;">Next Verse &rarr;</button>
+        <button id="inline-btn-fullscreen" class="btn btn-outline-info px-4 fw-bold" style="display: none;"><i data-lucide="maximize"></i> Fullscreen Mode</button>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center mb-4">
+    <button id="btn-detect-hdmi" class="btn btn-outline-info d-flex align-items-center gap-2 fw-bold" style="border-radius: 8px;">
+        <i data-lucide="monitor-up"></i> Enable HDMI / Projector Auto-Display
+    </button>
+</div>
 
 <div class="icds-quick-actions-container">
     <% if (recentLogs && recentLogs.length > 0) { %>

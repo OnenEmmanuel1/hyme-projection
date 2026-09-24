@@ -1,14 +1,22 @@
 DROP TABLE IF EXISTS CommandLog;
 DROP TABLE IF EXISTS Administrator;
+DROP TABLE IF EXISTS hymn_stanzas;
+DROP TABLE IF EXISTS hymns;
 DROP TABLE IF EXISTS Hymn;
 
-CREATE TABLE Hymn (
-    HymnID INT AUTO_INCREMENT PRIMARY KEY,
-    HymnNumber INT UNIQUE NOT NULL,
-    Title VARCHAR(100) NOT NULL,
-    Lyrics TEXT NOT NULL,
-    VersesJSON JSON,
-    Category VARCHAR(30)
+CREATE TABLE hymns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hymn_number INT UNIQUE NOT NULL,
+    title VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE hymn_stanzas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hymn_id INT NOT NULL,
+    stanza_number INT NOT NULL,
+    is_chorus BOOLEAN DEFAULT FALSE,
+    content TEXT NOT NULL,
+    FOREIGN KEY (hymn_id) REFERENCES hymns(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Administrator (
@@ -23,19 +31,21 @@ CREATE TABLE CommandLog (
     MatchedHymnID INT,
     Status ENUM('Matched', 'Not Found') NOT NULL,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (MatchedHymnID) REFERENCES Hymn(HymnID)
+    FOREIGN KEY (MatchedHymnID) REFERENCES hymns(id) ON DELETE SET NULL
 );
 
-CREATE INDEX idx_hymn_number ON Hymn(HymnNumber);
-CREATE INDEX idx_hymn_title ON Hymn(Title);
+CREATE INDEX idx_hymn_number ON hymns(hymn_number);
+CREATE INDEX idx_hymn_title ON hymns(title);
 
 -- Seed Administrator: username 'user', password 'password123'
--- Hash generated via bcrypt
 INSERT INTO Administrator (Username, PasswordHash) VALUES ('user', '$2b$10$s1ydfro5oFUhw6nAZZrEU.nb9oLQcB7o8s846y3YUu31C2TkyhhP2');
 
 -- Seed Demo Hymns
-INSERT INTO Hymn (HymnNumber, Title, Lyrics, Category) VALUES
-(245, 'Amazing Grace', 'Amazing grace! How sweet the sound\nThat saved a wretch like me!\nI once was lost, but now am found;\nWas blind, but now I see.', 'Worship'),
-(100, 'Holy, Holy, Holy', 'Holy, holy, holy! Lord God Almighty!\nEarly in the morning our song shall rise to thee.\nHoly, holy, holy! Merciful and mighty,\nGod in three persons, blessed Trinity!', 'Adoration'),
-(34, 'How Great Thou Art', 'O Lord my God, when I in awesome wonder\nConsider all the worlds Thy hands have made;\nI see the stars, I hear the rolling thunder,\nThy power throughout the universe displayed.', 'Praise'),
-(405, 'It Is Well With My Soul', 'When peace like a river, attendeth my way,\nWhen sorrows like sea billows roll;\nWhatever my lot, Thou hast taught me to say,\nIt is well, it is well, with my soul.', 'Comfort');
+INSERT INTO hymns (id, hymn_number, title) VALUES
+(1, 125, 'Amazing Grace'),
+(2, 42, 'Holy, Holy, Holy');
+
+INSERT INTO hymn_stanzas (id, hymn_id, stanza_number, is_chorus, content) VALUES
+(101, 1, 1, FALSE, 'Amazing grace! how sweet the sound,\nThat saved a wretch like me!\nI once was lost, but now am found,\nWas blind, but now I see.'),
+(102, 1, 2, FALSE, '’Twas grace that taught my heart to fear,\nAnd grace my fears relieved;\nHow precious did that grace appear\nThe hour I first believed!'),
+(103, 2, 1, FALSE, 'Holy, Holy, Holy! Lord God Almighty!\nEarly in the morning our song shall rise to Thee;');

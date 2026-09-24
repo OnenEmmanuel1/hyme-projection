@@ -28,5 +28,11 @@ module.exports = function(io) {
         }
     });
 
+    router.post('/navigate', (req, res) => {
+        const { action, index } = req.body;
+        io.emit('change_verse', { action, index });
+        res.json({ success: true });
+    });
+
     return router;
 };

@@ -23,6 +23,7 @@
     "fast-levenshtein": "^3.0.0",
     "genius-lyrics": "^4.4.7",
     "lyrics-finder": "^21.7.0",
+    "mammoth": "^1.12.3",
     "mysql2": "^3.24.3",
     "socket.io": "^4.8.3",
     "words-to-numbers": "^1.5.1"
