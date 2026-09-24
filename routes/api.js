@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { matchCommand } = require('../services/matchingEngine');
 const { logCommand } = require('../services/commandLogEngine');
+const { processCommand } = require('../services/nlpEngine');
 
 module.exports = function(io) {
     router.post('/voice-command', async (req, res) => {
@@ -13,6 +14,19 @@ module.exports = function(io) {
             await logCommand(text || '[Low Confidence / Unrecognized]', null);
             io.emit('hymn_match', { status: 'Not Found', reason: 'Low confidence' });
             return res.json({ status: 'Not Found', message: 'Command unclear, rejected due to low confidence' });
+        }
+
+        // NLP Processing for Intent Classification
+        const nlpResult = await processCommand(text);
+        
+        if (nlpResult.intent === 'intent.next_verse') {
+            await logCommand(text, null);
+            return res.json({ status: 'Command', action: 'next_verse' });
+        }
+        
+        if (nlpResult.intent === 'intent.prev_verse') {
+            await logCommand(text, null);
+            return res.json({ status: 'Command', action: 'prev_verse' });
         }
 
         const matchedHymn = await matchCommand(text);

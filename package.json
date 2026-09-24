@@ -25,6 +25,7 @@
     "lyrics-finder": "^21.7.0",
     "mammoth": "^1.12.3",
     "mysql2": "^3.24.3",
+    "node-nlp": "^5.0.0-alpha.5",
     "socket.io": "^4.8.3",
     "words-to-numbers": "^1.5.1"
   },

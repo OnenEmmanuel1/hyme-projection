@@ -257,6 +257,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 transcriptDisplay.classList.remove('has-text');
                 submitBtn.classList.remove('ready');
                 
+            } else if (result.status === 'Command') {
+                feedbackDisplay.textContent = `Executed Command: ${result.action.replace('_', ' ')}`;
+                feedbackDisplay.className = 'icds-feedback text-center mb-4 success';
+                
+                // Sync the local inline display
+                if (result.action === 'next_verse') {
+                    const inlineNext = document.getElementById('inline-btn-next');
+                    if (inlineNext && !inlineNext.disabled) inlineNext.click();
+                } else if (result.action === 'prev_verse') {
+                    const inlinePrev = document.getElementById('inline-btn-prev');
+                    if (inlinePrev && !inlinePrev.disabled) inlinePrev.click();
+                }
+                
+                // Optional: reset input
+                currentTranscript = '';
+                transcriptDisplay.value = '';
+                transcriptDisplay.placeholder = 'Type or say a hymn number, title, or lyrics...';
+                transcriptDisplay.classList.remove('has-text');
+                submitBtn.classList.remove('ready');
             } else {
                 feedbackDisplay.textContent = result.message || 'Hymn not found.';
                 feedbackDisplay.className = 'icds-feedback text-center mb-4 error';
