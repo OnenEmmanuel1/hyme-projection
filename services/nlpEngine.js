@@ -40,6 +40,9 @@ async function trainModel() {
     // Train and save the model
     console.log('Training NLP model...');
     await manager.train();
+    if (!fs.existsSync(path.dirname(modelPath))) {
+        fs.mkdirSync(path.dirname(modelPath), { recursive: true });
+    }
     manager.save(modelPath);
     console.log('NLP model trained and saved.');
 }
