@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS CommandLog;
+DROP TABLE IF EXISTS autoadvance_settings;
 DROP TABLE IF EXISTS Administrator;
 DROP TABLE IF EXISTS hymn_stanzas;
 DROP TABLE IF EXISTS hymns;
@@ -32,6 +33,16 @@ CREATE TABLE CommandLog (
     Status ENUM('Matched', 'Not Found') NOT NULL,
     Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (MatchedHymnID) REFERENCES hymns(id) ON DELETE SET NULL
+);
+
+CREATE TABLE autoadvance_settings (
+    settingId INT AUTO_INCREMENT PRIMARY KEY,
+    hymnId INT NULL,
+    mode ENUM('Timer', 'SilenceDetection', 'Both') NOT NULL DEFAULT 'Timer',
+    secondsPerVerse INT NULL,
+    silenceThresholdSeconds DECIMAL(4,1) NULL,
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (hymnId) REFERENCES hymns(id) ON DELETE CASCADE
 );
 
 CREATE INDEX idx_hymn_number ON hymns(hymn_number);

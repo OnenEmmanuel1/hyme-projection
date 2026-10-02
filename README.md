@@ -5,7 +5,7 @@ The **Intelligent Content Display System (ICDS)** is a production-grade, voice-c
 This project eliminates the friction of traditional presentation software by introducing a hands-free, intelligent voice pipeline, complete with real-time text-to-speech audio feedback on the projector and a secure, dark-themed administrative dashboard for managing hymn records.
 
 ## Features
-- **Voice Input Module**: Captures voice commands using the native Web Speech API (Machine Learning-based ASR).
+- **Voice Input Module**: Streams microphone audio to a server-side Vosk model for grammar-constrained offline recognition.
 - **Matching Engine**: Normalizes text and uses a fuzzy matching algorithm (Levenshtein distance) to match hymn titles and numbers.
 - **Automated Projection Interface**: Real-time push via Socket.IO to instantly update the projection display without reloading.
 - **Text-to-Voice Module**: Provides audible feedback on the display interface using the Web Speech Synthesis API.
@@ -13,10 +13,12 @@ This project eliminates the friction of traditional presentation software by int
 
 ## Prerequisites
 - Docker and Docker Compose
-- Modern Chromium-based browser (Chrome, Edge) with microphone access for the Web Speech API to work correctly.
+- Python 3 and `pip` for running the local Vosk worker outside Docker
+- Modern Chromium-based browser (Chrome, Edge) with microphone access. Microphone access requires HTTPS or localhost.
 
-> **Important Deployment Constraint (Web Speech API):**
-> The browser's native `SpeechRecognition` API requires user microphone permission. In modern browsers, this permission can only be granted in a Secure Context (HTTPS) or on `localhost`. When deploying this application for production use on a local network, you **must** serve it over HTTPS (e.g., using a reverse proxy like Nginx with self-signed certificates or Let's Encrypt), otherwise the browser will block the microphone request and the voice interface will not work.
+> **Offline recognition:** Vosk runs on the application server. Recognition audio is streamed to that server; it does not use a cloud speech service. Serve over HTTPS on a local network so the browser permits microphone access.
+>
+> The Operator page does not use browser speech recognition as a fallback. If Vosk or its local model is unavailable, voice input reports an error and sends no audio to an internet speech service.
 
 ## Setup Instructions
 
@@ -28,7 +30,9 @@ This project eliminates the friction of traditional presentation software by int
    ```bash
    docker-compose up --build -d
    ```
-   This will start a Node.js web server on port 3000 and a MySQL 8 database. The database will automatically initialize and seed itself with demo data.
+   Docker installs the Vosk Python binding and downloads/extracts `vosk-model-small-en-us-0.15` into `/models` during image build. The one-time build needs internet access; subsequent recognition is fully offline. Rebuilds may download the model again unless the Docker build cache is retained. The app communicates with a local Python worker, avoiding Vosk's Node `ffi-napi` native build, which can fail on Windows/Node 24. For a local non-Docker run, install Python 3, run `py -m pip install vosk`, download [the small English Vosk model](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip), extract it under `models/vosk-model-small-en-us-0.15/`, then run `npm install` and `npm start`. Set `VOSK_MODEL_PATH` if the model is elsewhere. Vosk is grammar-constrained using hymn numbers, titles, and command phrases fetched from the database when a recognition session starts; no custom model training is performed.
+
+   This starts Node.js and MySQL. The database schema is initialized on first run.
 
 3. **Access the System**:
    - **Operator Interface**: [http://localhost:3000/operator](http://localhost:3000/operator) (Requires microphone access)
@@ -46,7 +50,7 @@ This project eliminates the friction of traditional presentation software by int
   - 405: It Is Well With My Soul
 
 ## How to Test the Voice Interface
-1. Open the **Projection Display** (`/display`) in one browser window and click "Enable Audio & Start Display".
+1. Open the **Projection Display** (`/display`) in one browser window and click "Start Fullscreen Display" if needed.
 2. Open the **Operator Interface** (`/operator`) in another window or on another device (if using HTTPS).
 3. Click "Listen" and say a command:
    - *Number match*: "Please display hymn number 245"
@@ -54,3 +58,9 @@ This project eliminates the friction of traditional presentation software by int
    - *Fuzzy match*: "Play how great thou art"
    - *Not found*: "Sing a random song"
 4. Watch the Projection Display update instantly via Socket.IO and listen for the Text-to-Speech audio confirmation. Every attempt is logged in the DB (viewable in the Admin panel).
+
+## Recognition and verse advancement notes
+
+The pretrained Vosk English model runs locally on the application server after the model download. Grammar constraints narrow recognition to the installed hymn numbers, titles, and common commands. This is not a custom-trained acoustic model. The small model has lower raw accuracy than Google's cloud recognizer, particularly with noisy microphones or strong accents; the limited vocabulary helps but does not remove that limitation. If the model or native Vosk binding cannot load on a platform, the operator UI reports the startup error and voice recognition is unavailable until deployment is corrected.
+
+Verse advancement defaults to **Timer** at 28 seconds per verse. Admin can change the global mode, duration, and silence threshold in **Admin → Settings**; `SilenceDetection` and `Both` use experimental RMS audio energy detection from the operator microphone stream. Silence detection can trigger early or miss a pause when there is background music/noise, so Timer is the dependable default. Manual verse navigation remains available from the operator's inline display, along with pause and timer restart controls.

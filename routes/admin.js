@@ -112,8 +112,27 @@ router.get('/logs', async (req, res) => {
 });
 
 // --- SETTINGS ---
-router.get('/settings', (req, res) => {
-    res.render('admin/settings', { error: null, success: null });
+router.get('/settings', async (req, res) => {
+    let settings = { mode: 'Timer', secondsPerVerse: 28, silenceThresholdSeconds: 2.5 };
+    let hymns = [];
+    try { const [[rows], [allHymns]] = await Promise.all([pool.query('SELECT * FROM autoadvance_settings WHERE hymnId IS NULL LIMIT 1'), pool.query('SELECT id, hymn_number, title FROM hymns ORDER BY hymn_number')]); if (rows[0]) settings = rows[0]; hymns = allHymns; } catch (e) { console.error(e); }
+    res.render('admin/settings', { error: null, success: null, settings, hymns });
+});
+
+router.post('/settings/auto-advance', async (req, res) => {
+    const { mode, secondsPerVerse, silenceThresholdSeconds } = req.body;
+    const hymnId = req.body.hymnId ? Number(req.body.hymnId) : null;
+    try {
+        await pool.query('DELETE FROM autoadvance_settings WHERE hymnId <=> ?', [hymnId]);
+        await pool.query(`INSERT INTO autoadvance_settings (hymnId, mode, secondsPerVerse, silenceThresholdSeconds)
+          VALUES (?, ?, ?, ?)`, [hymnId, mode, Number(secondsPerVerse) || 28, Number(silenceThresholdSeconds) || 2.5]);
+        res.redirect('/admin/settings');
+    } catch (err) {
+        console.error(err);
+        const [rows] = await pool.query('SELECT * FROM autoadvance_settings WHERE hymnId IS NULL LIMIT 1').catch(() => [[]]);
+        const [hymns] = await pool.query('SELECT id, hymn_number, title FROM hymns ORDER BY hymn_number').catch(() => [[]]);
+        res.render('admin/settings', { error: 'Failed to save auto-advance settings', success: null, settings: rows[0] || { mode: 'Timer', secondsPerVerse: 28, silenceThresholdSeconds: 2.5 }, hymns });
+    }
 });
 
 router.post('/settings/password', async (req, res) => {

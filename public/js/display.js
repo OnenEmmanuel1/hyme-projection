@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentVerses = [];
     let currentVerseIndex = 0;
+    let advanceTimer = null, autoAdvancePaused = false, activeAutoSettings = { mode: 'Timer', secondsPerVerse: 28 };
+    function resetAdvanceTimer() {
+        clearTimeout(advanceTimer);
+        if (autoAdvancePaused || !currentVerses.length || !['Timer', 'Both'].includes(activeAutoSettings.mode)) return;
+        advanceTimer = setTimeout(() => {
+            if (currentVerseIndex < currentVerses.length - 1) { currentVerseIndex++; renderCurrentVerse(); resetAdvanceTimer(); }
+        }, Math.max(5, Number(activeAutoSettings.secondsPerVerse) || 28) * 1000);
+    }
 
     function renderCurrentVerse() {
         if (!currentVerses || currentVerses.length === 0) return;
@@ -28,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${v.text.split('\n').map(l => l.trim()).join('<br>')}
                 </div>
             </div>`;
+        resetAdvanceTimer();
     }
 
     function updateButtons() {
@@ -63,6 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.status === 'Matched') {
             const hymn = data.hymn;
+            activeAutoSettings = hymn.autoAdvanceSettings || activeAutoSettings;
+            autoAdvancePaused = false;
             
             hymnNumber.textContent = hymn.HymnNumber;
             hymnTitle.textContent = hymn.Title;
@@ -138,5 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCurrentVerse();
             }
         }
+    });
+    socket.on('advance_verse', data => {
+        if (!currentVerses.length) return;
+        if (data.action === 'next' && currentVerseIndex < currentVerses.length - 1) currentVerseIndex++;
+        if (data.action === 'previous' && currentVerseIndex > 0) currentVerseIndex--;
+        renderCurrentVerse();
+    });
+    socket.on('advance_control', data => {
+        if (data.action === 'pause') { autoAdvancePaused = true; clearTimeout(advanceTimer); }
+        if (data.action === 'resume' || data.action === 'restart') { autoAdvancePaused = false; resetAdvanceTimer(); }
+    });
+    socket.on('silence_advance', () => {
+        if (currentVerseIndex < currentVerses.length - 1) { currentVerseIndex++; renderCurrentVerse(); }
     });
 });

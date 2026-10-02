@@ -5,6 +5,21 @@
     </div>
 
     <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0"><div class="card-body p-4">
+                <h5 class="fw-bold text-white mb-3">Verse auto-advance</h5>
+                <p class="text-muted">Global defaults apply to hymns without a per-hymn override.</p>
+                <form action="/admin/settings/auto-advance" method="POST">
+                    <label class="form-label text-muted">Apply to</label>
+                    <select class="form-select mb-3" name="hymnId"><option value="">Global default</option><% hymns.forEach(h => { %><option value="<%= h.id %>">Hymn <%= h.hymn_number %> — <%= h.title %></option><% }) %></select>
+                    <label class="form-label text-muted">Mode</label>
+                    <select class="form-select mb-3" name="mode"><option value="Timer" <%= settings.mode === 'Timer' ? 'selected' : '' %>>Timer (reliable)</option><option value="SilenceDetection" <%= settings.mode === 'SilenceDetection' ? 'selected' : '' %>>Silence detection (experimental)</option><option value="Both" <%= settings.mode === 'Both' ? 'selected' : '' %>>Both</option></select>
+                    <label class="form-label text-muted">Seconds per verse</label><input class="form-control mb-3" type="number" name="secondsPerVerse" min="5" max="300" value="<%= settings.secondsPerVerse || 28 %>" required>
+                    <label class="form-label text-muted">Silence duration (seconds)</label><input class="form-control mb-3" type="number" name="silenceThresholdSeconds" min="1" max="10" step="0.1" value="<%= settings.silenceThresholdSeconds || 2.5 %>" required>
+                    <button class="btn btn-primary fw-bold">Save auto-advance settings</button>
+                </form>
+            </div></div>
+        </div>
         <div class="col-md-6">
             <div class="card shadow-sm border-0">
                 <div class="card-body p-4">
